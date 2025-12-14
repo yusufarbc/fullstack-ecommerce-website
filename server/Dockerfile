@@ -1,10 +1,10 @@
-FROM node:18-alpine
+FROM node:18-alpine3.17
 
 # Set working directory
 WORKDIR /app
 
-# Install dependencies for native modules
-RUN apk add --no-cache python3 make g++
+# Install dependencies for native modules and OpenSSL for Prisma
+RUN apk add --no-cache python3 make g++ openssl-dev openssl1.1-compat
 
 # Copy package files
 COPY package*.json ./
