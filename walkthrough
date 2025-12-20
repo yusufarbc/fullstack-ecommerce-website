@@ -1,0 +1,139 @@
+Act as a Senior Full Stack Software Architect. I need you to scaffold a complete, production-ready "Monorepo" structure for an E-Commerce application with an Admin Panel.
+
+**Tech Stack:**
+1.  **Backend:** Node.js, Express.js, Prisma ORM, PostgreSQL.
+2.  **Admin Panel:** AdminJS (integrated into the Node.js server).
+3.  **Frontend:** React (via Vite), Tailwind CSS, Axios.
+4.  **DevOps:** Docker & Docker Compose (for orchestration).
+
+**Directory Structure:**
+The project root must look like this:
+/eticaret-projesi
+├── /client (React App)
+├── /server (Node App)
+├── docker-compose.yml
+└── .env (Assume variables exist, use process.env)
+
+---
+
+### REQUESTS BY COMPONENT:
+
+#### 1. Backend Setup (/server)
+* **Core:** Initialize a standard Express app with **MSC Architecture** (Model-Service-Controller).
+* **Dependencies:** `express`, `cors`, `helmet`, `dotenv`, `prisma`, `@prisma/client`, `zod`, `bcrypt` (for password hashing), `jsonwebtoken`.
+* **AdminJS Integration:**
+    * Install `adminjs`, `@adminjs/express`, `@adminjs/prisma`.
+    * Configure AdminJS to run on the `/admin` route.
+    * Connect it to Prisma so it automatically generates CRUD interfaces for the `User` model.
+* **Database & Seeding:**
+    * Create a `schema.prisma` with a `User` model (id, email, password, role, fullName).
+    * **CRITICAL:** Create a `prisma/seed.js` script. It must check if a user with email "admin@siten.com" exists. If not, create it with role 'ADMIN' and a hashed password (use bcrypt).
+    * Add `"prisma": { "seed": "node prisma/seed.js" }` to package.json.
+* **Health Check:** Create a simple endpoint at `/api/v1/health`.
+
+#### 2. Frontend Setup (/client)
+* **Core:** Initialize a Vite + React project.
+* **Dependencies:** `axios`, `react-router-dom`, `lucide-react`, `clsx`.
+* **Tailwind:** Configure `tailwind.config.js` and `index.css`.
+* **Axios Strategy (JWT):**
+    * Create a reusable Axios instance file (`src/lib/axios.js`).
+    * Add a **Request Interceptor** that reads the `token` from `localStorage` and adds `Authorization: Bearer <TOKEN>` header to every request automatically.
+* **UI:** Create a simple `App.jsx` that fetches the `/api/v1/health` status from the backend.
+
+#### 3. Docker Orchestration (Root)
+* **server/Dockerfile:** Use `node:18-alpine`.
+* **client/Dockerfile:** Use `node:18-alpine`. Setup for Vite dev server.
+* **docker-compose.yml:**
+    * Service `db`: PostgreSQL 15. Use volume `postgres_data`.
+    * Service `backend`: Link to `db`. Expose 8080. Ensure it waits for `db`.
+    * Service `client`: Expose 3000.
+    * **Volumes:** Persist Postgres data.
+
+---
+
+### DELIVERABLES:
+Please provide the full content for the following files. **Do not omit code**, I need to copy-paste them to get the system running.
+
+1.  `docker-compose.yml`
+2.  `server/package.json` (Include all AdminJS and seeding scripts)
+3.  `server/Dockerfile`
+4.  `server/prisma/schema.prisma`
+5.  `server/prisma/seed.js` (The Admin User seeding logic)
+6.  `server/src/app.js` (Express entry point with AdminJS and API routes configured)
+7.  `client/package.json`
+8.  `client/Dockerfile`
+9.  `client/vite.config.js` (Setup proxy: /api -> backend:8080)
+10. `client/src/lib/axios.js` (The Axios instance with Interceptor)
+
+
+
+Act as a Senior Full Stack Software Architect. I need you to scaffold a complete, production-ready "Monorepo" structure for an E-Commerce application with an integrated Admin Panel.
+
+**Focus:** Pure E-Commerce functionality. No extra DevOps tools (like Prometheus, Netdata, etc.) for now.
+
+**Tech Stack:**
+1.  **Backend:** Node.js, Express.js, Prisma ORM, PostgreSQL.
+2.  **Admin Panel:** AdminJS (integrated directly into the Node.js server).
+3.  **Frontend:** React (via Vite), Tailwind CSS, Axios.
+4.  **DevOps:** Docker & Docker Compose (Simple orchestration).
+
+**Directory Structure:**
+The project root must look like this:
+/eticaret-projesi
+├── /client (React App)
+├── /server (Node App)
+├── docker-compose.yml
+└── .env (Assume variables exist, use process.env)
+
+---
+
+### REQUESTS BY COMPONENT:
+
+#### 1. Backend Setup (/server)
+* **Core:** Initialize a standard Express app with **MSC Architecture** (Model-Service-Controller).
+* **Dependencies:** `express`, `cors`, `helmet`, `dotenv`, `prisma`, `@prisma/client`, `zod`, `bcrypt` (password hashing), `jsonwebtoken` (JWT), `adminjs`, `@adminjs/express`, `@adminjs/prisma`.
+* **AdminJS Integration:**
+    * Configure AdminJS to run on the `/admin` route.
+    * Connect it to Prisma so it automatically generates CRUD interfaces for `User`, `Product`, and `Order` models.
+* **Database & Seeding:**
+    * Create a `schema.prisma` with these models:
+        * **User:** id, email, password, role (USER/ADMIN), fullName, tckn (for invoicing), address, city.
+        * **Product:** id, name, price (Decimal), stock, imageUrl.
+        * **Order:** id, userId, totalAmount, status, invoiceStatus.
+    * **CRITICAL:** Create a `prisma/seed.js` script. It must check if a user with email "admin@siten.com" exists. If not, create it with role 'ADMIN' and a hashed password (use bcrypt).
+* **API:** Create a simple health check endpoint at `/api/v1/health`.
+
+#### 2. Frontend Setup (/client)
+* **Core:** Initialize a Vite + React project.
+* **Dependencies:** `axios`, `react-router-dom`, `lucide-react` (icons), `clsx`.
+* **Tailwind:** Configure `tailwind.config.js` and `index.css`.
+* **Axios Strategy (JWT):**
+    * Create `src/lib/axios.js`.
+    * Add a **Request Interceptor** that reads the `token` from `localStorage` and adds `Authorization: Bearer <TOKEN>` header to every request automatically.
+* **UI:** Create a simple `App.jsx` that fetches the `/api/v1/health` status from the backend to prove connection works.
+
+#### 3. Docker Orchestration (Root)
+* **server/Dockerfile:** Use `node:18-alpine`. Expose 8080.
+* **client/Dockerfile:** Use `node:18-alpine`. Setup for Vite dev server. Expose 3000.
+* **docker-compose.yml:**
+    * Service `db`: PostgreSQL 15. Use volume `postgres_data`.
+    * Service `backend`: Link to `db`. Expose 8080. Ensure it waits for `db`.
+    * Service `client`: Expose 3000.
+    * **Volumes:** Persist Postgres data using a named volume.
+
+---
+
+### DELIVERABLES:
+Please provide the full content for the following files. **Do not omit code**, I need to copy-paste them to get the system running immediately.
+
+1.  `docker-compose.yml`
+2.  `server/package.json` (Include seeding script)
+3.  `server/Dockerfile`
+4.  `server/prisma/schema.prisma` (Include the models specified above)
+5.  `server/prisma/seed.js` (The Admin User seeding logic)
+6.  `server/src/app.js` (Express entry point with AdminJS)
+7.  `client/package.json`
+8.  `client/Dockerfile`
+9.  `client/vite.config.js` (Setup proxy: /api -> backend:8080)
+10. `client/src/lib/axios.js`
+11. `client/src/App.jsx`
