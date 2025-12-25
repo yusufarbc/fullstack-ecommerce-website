@@ -1,17 +1,19 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { PrismaClient } from '@prisma/client';
 import AdminJS from 'adminjs';
 import AdminJSExpress from '@adminjs/express';
 import { Database, Resource } from '@adminjs/prisma';
+import { config } from './config.js';
+import prisma from './prisma.js';
+import productRoutes from './routes/products.js';
+import categoryRoutes from './routes/categories.js';
+import orderRoutes from './routes/orders.js';
 
 // Register the adapter
 AdminJS.registerAdapter({ Database, Resource });
 
 const app = express();
-const prisma = new PrismaClient();
-const PORT = process.env.PORT || 8080;
 
 // AdminJS Configuration
 const startAdmin = async () => {
@@ -24,18 +26,18 @@ const startAdmin = async () => {
         rootPath: '/admin',
     });
 
-    // Build router
-    // AdminJSExpress.buildRouter is compatible with ESM
     const adminRouter = AdminJSExpress.buildRouter(admin);
     app.use(admin.options.rootPath, adminRouter);
 
-    console.log(`AdminJS started on http://localhost:${PORT}${admin.options.rootPath}`);
+    console.log(`AdminJS started on http://localhost:${config.port}${admin.options.rootPath}`);
 };
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: config.corsOrigin
+}));
 app.use(helmet({
-    contentSecurityPolicy: false, // Disabled for AdminJS compatibility in dev
+    contentSecurityPolicy: false, // Disabled for AdminJS compatibility
 }));
 app.use(express.json());
 
@@ -44,12 +46,16 @@ app.get('/api/v1/health', (req, res) => {
     res.json({ status: 'UP', timestamp: new Date() });
 });
 
+app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/orders', orderRoutes);
+
 // Start Server
 const startServer = async () => {
     await startAdmin();
 
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+    app.listen(config.port, () => {
+        console.log(`Server running on port ${config.port}`);
     });
 };
 

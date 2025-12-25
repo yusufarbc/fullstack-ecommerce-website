@@ -1,9 +1,16 @@
 Act as a Senior Full Stack Software Architect. I need you to scaffold a complete, production-ready "Monorepo" structure for an E-Commerce application with an Admin Panel.
 
+SOLID Principles:
+1. Single Responsibility Principle (SRP)
+2. Open/Closed Principle (OCP)
+3. Liskov Substitution Principle (LSP)
+4. Interface Segregation Principle (ISP)
+5. Dependency Inversion Principle (DIP)
+
 **Tech Stack:**
 1.  **Backend:** Node.js, Express.js, Prisma ORM, PostgreSQL.
 2.  **Admin Panel:** AdminJS (integrated into the Node.js server).
-3.  **Frontend:** React (via Vite), Tailwind CSS, Axios.
+3.  **Frontend:** React (via Vite), Tailwind CSS, Axios. PWA (Progressive Web App) support. mobile-first design.
 4.  **DevOps:** Docker & Docker Compose (for orchestration).
 
 **Directory Structure:**

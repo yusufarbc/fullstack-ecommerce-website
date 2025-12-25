@@ -1,32 +1,76 @@
-import { useState, useEffect } from 'react';
-import api from './lib/axios';
+import { Home } from './pages/Home';
+import { CheckoutPage } from './pages/CheckoutPage';
+import { ProductDetail } from './pages/ProductDetail';
+import { CartProvider, useCart } from './context/CartContext';
+import { CartSidebar } from './components/CartSidebar';
+import { ShoppingCart, Search } from 'lucide-react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 
-function App() {
-    const [health, setHealth] = useState('Loading...');
+function Header() {
+    const { toggleSidebar, cartCount } = useCart();
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        api.get('/api/v1/health')
-            .then(res => setHealth(JSON.stringify(res.data, null, 2)))
-            .catch(err => setHealth('Error connecting to server'));
-    }, []);
+    const handleSearch = (e) => {
+        if (e.key === 'Enter') {
+            navigate(`/?search=${encodeURIComponent(e.target.value)}`);
+        }
+    };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
-                <h1 className="text-2xl font-bold mb-4 text-gray-800">E-Commerce App</h1>
-                <div className="p-4 bg-gray-50 rounded border border-gray-200">
-                    <p className="text-sm font-semibold text-gray-500 mb-2">Backend Status:</p>
-                    <pre className="text-xs text-green-600 font-mono whitespace-pre-wrap">
-                        {health}
-                    </pre>
+        <header className="bg-white shadow sticky top-0 z-40">
+            <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <h1
+                    className="text-2xl font-black text-gray-900 tracking-tight cursor-pointer"
+                    onClick={() => navigate('/')}
+                >
+                    E-Shop
+                </h1>
+
+                <div className="flex-1 max-w-md mx-8 hidden sm:block relative">
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        className="w-full border border-gray-300 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                        onKeyDown={handleSearch}
+                    />
+                    <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
                 </div>
-                <div className="mt-6 flex gap-4">
-                    <a href="/admin" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                        Go to Admin Panel
-                    </a>
+
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={toggleSidebar}
+                        className="relative p-2 text-gray-600 hover:text-blue-600 transition rounded-full hover:bg-gray-100"
+                    >
+                        <ShoppingCart size={24} />
+                        {cartCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                {cartCount}
+                            </span>
+                        )}
+                    </button>
                 </div>
             </div>
-        </div>
+        </header>
+    );
+}
+
+function App() {
+    return (
+        <BrowserRouter>
+            <CartProvider>
+                <div className="min-h-screen bg-gray-50">
+                    <Header />
+                    <main>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/checkout" element={<CheckoutPage />} />
+                            <Route path="/product/:id" element={<ProductDetail />} />
+                        </Routes>
+                    </main>
+                    <CartSidebar />
+                </div>
+            </CartProvider>
+        </BrowserRouter>
     );
 }
 
