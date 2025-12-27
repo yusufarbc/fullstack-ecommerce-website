@@ -12,21 +12,46 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  backend:
-    build: ./server
+  api:
+    build: ./api
     restart: always
     ports:
       - "8080:8080"
     environment:
-      DATABASE_URL: postgres://postgres:password@db:5432/ecommerce
+      NODE_ENV: development
       PORT: 8080
-      JWT_SECRET: supersecretkey123
-      SESSION_SECRET: anothersecretkey456
+      DATABASE_URL: postgres://postgres:password@db:5432/ecommerce?schema=public
+      CLIENT_URL: http://localhost:3000
+      IYZICO_API_KEY: "dummy"
+      IYZICO_SECRET_KEY: "dummy"
+      BREVO_API_KEY: "dummy"
     depends_on:
-      - db
-    links:
-      - db
+      db:
+        condition: service_healthy
+
+  admin:
+    build: ./admin
+    restart: always
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./admin:/app
+      - admin_node_modules:/app/node_modules
+    environment:
+      NODE_ENV: development
+      PORT: 8081
+      DATABASE_URL: postgres://postgres:password@db:5432/ecommerce?schema=public
+      SESSION_SECRET: adminsecretkey789
+      COOKIE_PASSWORD: securecookiepassword1234567890123
+    depends_on:
+      db:
+        condition: service_healthy
 
   client:
     build: ./client
@@ -34,9 +59,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_URL=/api
+      - VITE_API_URL=http://localhost:8080/api/v1
     depends_on:
-      - backend
+      - api
 
 volumes:
   postgres_data:
+  admin_node_modules:

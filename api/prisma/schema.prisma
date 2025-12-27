@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum InvoiceStatus {
+  NOT_ISSUED
+  ISSUED
+  PAID
+}
+
+// User table for Admin access only.
+// The API service does not use this, but it is required for DB schema consistency.
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Product {
+  id          String      @id @default(uuid())
+  name        String
+  price       Decimal
+  stock       Int
+  description String?
+  imageUrl    String?
+  categoryId  String?
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  items         OrderItem[]
+  totalAmount   Decimal
+  status        OrderStatus   @default(PENDING)
+  invoiceStatus InvoiceStatus @default(NOT_ISSUED)
+  
+  // Guest & Shipping Info
+  guestEmail    String?
+  guestName     String?
+  guestSurname  String?
+  guestPhone    String?
+  address       String?       // Shipping address
+  city          String?
+  zipCode       String?
+  
+  // Payment Info (Iyzico)
+  paymentId     String?
+  paymentStatus String?       @default("PENDING") // SUCCESS, FAILURE
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Decimal
+}
