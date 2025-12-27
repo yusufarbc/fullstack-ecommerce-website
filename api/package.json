@@ -24,6 +24,7 @@
     "express-formidable": "^1.2.0",
     "express-session": "^1.17.3",
     "helmet": "^7.0.0",
+    "iyzipay": "^2.0.61",
     "jsonwebtoken": "^9.0.1",
     "zod": "^3.21.4"
   },

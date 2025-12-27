@@ -1,3 +1,6 @@
+
+import Iyzipay from 'iyzipay';
+
 /**
  * Service to handle Iyzico payment gateway integrations.
  * Adheres to SRP by handling only payment interactions.
@@ -9,8 +12,11 @@ export class IyzicoService {
      */
     constructor(config) {
         this.config = config;
-        // In a real implementation, you would initialize the 'iyzipay' library here.
-        // this.iyzipay = new Iyzipay(config);
+        this.iyzipay = new Iyzipay({
+            apiKey: config.apiKey,
+            secretKey: config.secretKey,
+            uri: config.baseUrl || 'https://sandbox-api.iyzipay.com'
+        });
     }
 
     /**
@@ -22,15 +28,71 @@ export class IyzicoService {
      * @returns {Promise<Object>} - The result containing the payment page URL or status.
      */
     async startPaymentProcess(order, basketItems, buyer) {
-        // Mock implementation for Iyzico start payment
         console.log('Starting Iyzico payment for order:', order.id);
 
-        // return new Promise(...) -> call iyzico api
-        return {
-            status: 'success',
-            paymentPageUrl: 'https://sandbox-payment.iyzico.com/payment/mock-page/' + order.id,
-            token: 'mock-payment-token-' + order.id
+        const request = {
+            locale: Iyzipay.LOCALE.TR,
+            conversationId: order.id.toString(),
+            price: order.totalPrice.toString(), // Ensure string format
+            paidPrice: order.totalPrice.toString(),
+            currency: Iyzipay.CURRENCY.TRY,
+            basketId: order.id.toString(),
+            paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
+            callbackUrl: \`\${process.env.VITE_API_URL}/api/payment/callback\`,
+            enabledInstallments: [1, 2, 3, 6, 9],
+            buyer: {
+                id: buyer.id || 'guest',
+                name: buyer.name || 'Guest',
+                surname: buyer.surname || 'User',
+                gsmNumber: buyer.phone || '+905555555555',
+                email: buyer.email || 'guest@example.com',
+                identityNumber: '11111111111',
+                lastLoginDate: '2023-01-01 00:00:00',
+                registrationDate: '2023-01-01 00:00:00',
+                registrationAddress: buyer.address || 'Istanbul',
+                ip: buyer.ip || '85.85.85.85',
+                city: buyer.city || 'Istanbul',
+                country: buyer.country || 'Turkey',
+                zipCode: buyer.zipCode || '34732'
+            },
+            shippingAddress: {
+                contactName: buyer.name || 'Guest',
+                city: buyer.city || 'Istanbul',
+                country: buyer.country || 'Turkey',
+                address: buyer.address || 'Istanbul',
+                zipCode: buyer.zipCode || '34732'
+            },
+            billingAddress: {
+                contactName: buyer.name || 'Guest',
+                city: buyer.city || 'Istanbul',
+                country: buyer.country || 'Turkey',
+                address: buyer.address || 'Istanbul',
+                zipCode: buyer.zipCode || '34732'
+            },
+            basketItems: basketItems.map(item => ({
+                id: item.id.toString(),
+                name: item.name,
+                category1: item.category || 'General',
+                itemType: Iyzipay.BASKET_ITEM_TYPE.PHYSICAL,
+                price: item.price.toString()
+            }))
         };
+
+        return new Promise((resolve, reject) => {
+            this.iyzipay.checkoutFormInitialize.create(request, (err, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                if (result.status !== 'success') {
+                    return reject(new Error(\`Iyzico Error: \${result.errorMessage}\`));
+                }
+                resolve({
+                    status: 'success',
+                    paymentPageUrl: result.paymentPageUrl,
+                    token: result.token
+                });
+            });
+        });
     }
 
     /**
@@ -40,17 +102,29 @@ export class IyzicoService {
      * @returns {Promise<Object>} - The verified payment result.
      */
     async retrievePaymentResult(token) {
-        // Mock implementation for retrieving result
         console.log('Retrieving Iyzico result for token:', token);
 
-        return {
-            status: 'success',
-            paymentStatus: 'SUCCESS',
-            paymentId: 'iyzico-payment-id-123',
-            paidPrice: 100.00
-        };
+        return new Promise((resolve, reject) => {
+            this.iyzipay.checkoutForm.retrieve({
+                locale: Iyzipay.LOCALE.TR,
+                conversationId: '123456789', // Should ideally match the start request
+                token: token
+            }, (err, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                if (result.status !== 'success') {
+                    return reject(new Error(\`Iyzico Verification Error: \${result.errorMessage}\`));
+                }
+                
+                resolve({
+                    status: 'success',
+                    paymentStatus: result.paymentStatus,
+                    paymentId: result.paymentId,
+                    paidPrice: result.paidPrice,
+                    rawResult: result
+                });
+            });
+        });
     }
 }
-
-// Singleton instance would be exported in a real DI setup or initialized in the Controller.
-// Refactored to pure class export for DI container.
