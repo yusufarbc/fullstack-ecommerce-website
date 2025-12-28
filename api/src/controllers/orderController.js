@@ -1,10 +1,12 @@
+import { asyncHandler } from '../utils/asyncHandler.js';
+
 /**
  * Controller for handling Order HTTP requests.
  */
 export class OrderController {
     /**
      * Creates an instance of OrderController.
-     * @param {OrderService} orderService - The order service instance.
+     * @param {import('../services/orderService.js').OrderService} orderService - The order service instance.
      */
     constructor(orderService) {
         this.orderService = orderService;
@@ -12,16 +14,13 @@ export class OrderController {
 
     /**
      * Handles the checkout process.
-     * @param {Object} req - The Express request object.
-     * @param {Object} res - The Express response object.
+     * 
+     * @param {import('express').Request} req - The Express request object.
+     * @param {import('express').Response} res - The Express response object.
+     * @param {import('express').NextFunction} next - The Express next function.
      */
-    createCheckoutSession = async (req, res) => {
-        try {
-            const result = await this.orderService.processCheckout(req.body);
-            res.json(result);
-        } catch (error) {
-            console.error('Checkout error:', error);
-            res.status(500).json({ error: 'Checkout failed' });
-        }
-    };
+    createCheckoutSession = asyncHandler(async (req, res, next) => {
+        const result = await this.orderService.processCheckout(req.body);
+        res.json(result);
+    });
 }

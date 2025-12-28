@@ -9,9 +9,6 @@ export class EmailService {
      */
     constructor(apiKey) {
         this.apiKey = apiKey;
-        // In real implementation: 
-        // this.apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-        // this.apiInstance.setApiKey(SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, apiKey);
     }
 
     /**
@@ -19,7 +16,10 @@ export class EmailService {
      * 
      * @param {string} toEmail - Recipient email address.
      * @param {string} toName - Recipient name.
-     * @param {Object} orderDetails - Object containing order summary (ID, total, items).
+     * @param {Object} orderDetails - Object containing order summary.
+     * @param {number} orderDetails.id - Order ID.
+     * @param {number} orderDetails.total - Total amount.
+     * @param {Array} [orderDetails.items] - List of items.
      * @returns {Promise<void>}
      */
     async sendOrderConfirmation(toEmail, toName, orderDetails) {

@@ -12,8 +12,8 @@ export class BaseRepository {
 
     /**
      * Finds all records matching the given options.
-     * @param {Object} options - Prisma findMany options.
-     * @returns {Promise<Array>} List of records.
+     * @param {Object} [options={}] - Prisma findMany options.
+     * @returns {Promise<Array<Object>>} List of records.
      */
     async findAll(options = {}) {
         return this.model.findMany(options);

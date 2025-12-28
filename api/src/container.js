@@ -22,13 +22,11 @@ import { EmailService } from './services/emailService.js';
 import { ProductController } from './controllers/productController.js';
 import { CategoryController } from './controllers/categoryController.js';
 import { OrderController } from './controllers/orderController.js';
+import { PaymentController } from './controllers/paymentController.js';
+
+import { config } from './config.js';
 
 // Configuration
-const IYZICO_CONFIG = {
-    apiKey: process.env.IYZICO_API_KEY,
-    secretKey: process.env.IYZICO_SECRET_KEY,
-    baseUrl: process.env.IYZICO_BASE_URL || 'https://sandbox-api.iyzipay.com'
-};
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
 // Repositories
@@ -37,7 +35,7 @@ const categoryRepository = new CategoryRepository(prisma);
 const orderRepository = new OrderRepository(prisma);
 
 // Infrastructure Services
-const iyzicoService = new IyzicoService(IYZICO_CONFIG);
+const iyzicoService = new IyzicoService(config.iyzico);
 const emailService = new EmailService(BREVO_API_KEY);
 
 // Domain Services
@@ -49,9 +47,11 @@ const orderService = new OrderService(orderRepository, productService, iyzicoSer
 const productController = new ProductController(productService);
 const categoryController = new CategoryController(categoryService);
 const orderController = new OrderController(orderService);
+const paymentController = new PaymentController(orderService);
 
 export {
     productController,
     categoryController,
-    orderController
+    orderController,
+    paymentController
 };

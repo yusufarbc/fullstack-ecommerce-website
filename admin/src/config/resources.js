@@ -4,8 +4,8 @@ import { getModelByName } from '@adminjs/prisma';
  * Defines the AdminJS resources configuration.
  * Maps Prisma models to AdminJS resources with navigation options.
  * 
- * @param {Object} prisma - The Prisma Client instance.
- * @returns {Array} List of resource objects for AdminJS.
+ * @param {import('@prisma/client').PrismaClient} prisma - The Prisma Client instance.
+ * @returns {Array<import('adminjs').ResourceWithOptions>} List of resource objects for AdminJS.
  */
 export const getAdminResources = (prisma) => {
     return [

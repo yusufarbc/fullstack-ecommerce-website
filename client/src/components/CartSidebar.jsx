@@ -1,6 +1,13 @@
 import { X, Minus, Plus, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
+/**
+ * CartSidebar Component.
+ * Displays the current cart items, total price, and checkout button.
+ * Slides in from the right.
+ * 
+ * @returns {JSX.Element|null} The rendered component or null if closed.
+ */
 export function CartSidebar() {
     const {
         isSidebarOpen,

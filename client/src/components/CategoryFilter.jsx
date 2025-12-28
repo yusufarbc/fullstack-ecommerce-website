@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import api from '../lib/axios';
 
+/**
+ * CategoryFilter Component.
+ * Displays a horizontal scrollable list of categories for filtering products.
+ * 
+ * @param {Object} props - Component props.
+ * @param {Function} props.onCategorySelect - Callback when a category is selected (receives categoryId or null).
+ * @param {string|null} props.selectedCategory - Currently selected category ID.
+ * @returns {JSX.Element} The rendered component.
+ */
 export function CategoryFilter({ onCategorySelect, selectedCategory }) {
     const [categories, setCategories] = useState([]);
 
@@ -22,8 +31,8 @@ export function CategoryFilter({ onCategorySelect, selectedCategory }) {
             <button
                 onClick={() => onCategorySelect(null)}
                 className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${selectedCategory === null
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
             >
                 All Products
@@ -33,8 +42,8 @@ export function CategoryFilter({ onCategorySelect, selectedCategory }) {
                     key={category.id}
                     onClick={() => onCategorySelect(category.id)}
                     className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${selectedCategory === category.id
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                 >
                     {category.name}

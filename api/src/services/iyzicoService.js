@@ -22,10 +22,20 @@ export class IyzicoService {
     /**
      * Creates a payment session or initializes a checkout form.
      * 
-     * @param {Object} order - The order details.
-     * @param {Array} basketItems - List of items in the basket.
-     * @param {Object} buyer - Buyer information (guest or user).
-     * @returns {Promise<Object>} - The result containing the payment page URL or status.
+     * @param {import('@prisma/client').Order} order - The order details.
+     * @param {Array<Object>} basketItems - List of items in the basket.
+     * @param {Object} buyer - Buyer information.
+     * @param {string} buyer.id - Buyer ID.
+     * @param {string} buyer.name - Buyer Name.
+     * @param {string} buyer.surname - Buyer Surname.
+     * @param {string} buyer.email - Buyer Email.
+     * @param {string} [buyer.phone] - Buyer GSM Number.
+     * @param {string} buyer.address - Registration address.
+     * @param {string} buyer.city - City.
+     * @param {string} buyer.country - Country.
+     * @param {string} buyer.zipCode - Zip Code.
+     * @param {string} [buyer.ip] - IP address.
+     * @returns {Promise<{status: string, paymentPageUrl: string, token: string}>} - The result.
      */
     async startPaymentProcess(order, basketItems, buyer) {
         console.log('Starting Iyzico payment for order:', order.id);
@@ -33,12 +43,12 @@ export class IyzicoService {
         const request = {
             locale: Iyzipay.LOCALE.TR,
             conversationId: order.id.toString(),
-            price: order.totalPrice.toString(), // Ensure string format
-            paidPrice: order.totalPrice.toString(),
+            price: order.totalAmount.toString(), // Ensure string format
+            paidPrice: order.totalAmount.toString(),
             currency: Iyzipay.CURRENCY.TRY,
             basketId: order.id.toString(),
             paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
-            callbackUrl: \`\${process.env.VITE_API_URL}/api/payment/callback\`,
+            callbackUrl: `${process.env.VITE_API_URL}/api/v1/payment/callback`,
             enabledInstallments: [1, 2, 3, 6, 9],
             buyer: {
                 id: buyer.id || 'guest',
@@ -69,13 +79,19 @@ export class IyzicoService {
                 address: buyer.address || 'Istanbul',
                 zipCode: buyer.zipCode || '34732'
             },
-            basketItems: basketItems.map(item => ({
-                id: item.id.toString(),
-                name: item.name,
-                category1: item.category || 'General',
-                itemType: Iyzipay.BASKET_ITEM_TYPE.PHYSICAL,
-                price: item.price.toString()
-            }))
+            basketItems: basketItems.flatMap(item => {
+                const items = [];
+                for (let i = 0; i < item.quantity; i++) {
+                    items.push({
+                        id: item.id.toString(),
+                        name: item.name,
+                        category1: item.category || 'General',
+                        itemType: Iyzipay.BASKET_ITEM_TYPE.PHYSICAL,
+                        price: item.price.toString()
+                    });
+                }
+                return items;
+            })
         };
 
         return new Promise((resolve, reject) => {
@@ -84,7 +100,7 @@ export class IyzicoService {
                     return reject(err);
                 }
                 if (result.status !== 'success') {
-                    return reject(new Error(\`Iyzico Error: \${result.errorMessage}\`));
+                    return reject(new Error(`Iyzico Error: ${result.errorMessage}`));
                 }
                 resolve({
                     status: 'success',
@@ -114,9 +130,9 @@ export class IyzicoService {
                     return reject(err);
                 }
                 if (result.status !== 'success') {
-                    return reject(new Error(\`Iyzico Verification Error: \${result.errorMessage}\`));
+                    return reject(new Error(`Iyzico Verification Error: ${result.errorMessage}`));
                 }
-                
+
                 resolve({
                     status: 'success',
                     paymentStatus: result.paymentStatus,

@@ -4,8 +4,8 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-    const adminEmail = 'admin@store.com';
-    const adminPassword = 'securepassword'; // In production, use ENV
+    const adminEmail = 'admin@siten.com';
+    const adminPassword = 'Admin123!'; // In production, use ENV
 
     const existingAdmin = await prisma.user.findUnique({
         where: { email: adminEmail },

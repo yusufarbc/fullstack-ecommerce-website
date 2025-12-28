@@ -40,6 +40,10 @@ const start = async () => {
     app.use(admin.options.rootPath, adminRouter);
 
     // 4. Server Listen
+    app.get('/', (req, res) => {
+        res.redirect(admin.options.rootPath);
+    });
+
     const PORT = process.env.PORT || 8081;
     app.listen(PORT, () => {
         console.log(`AdminJS started on http://localhost:${PORT}${admin.options.rootPath}`);

@@ -6,6 +6,7 @@ import prisma from './prisma.js';
 import productRoutes from './routes/products.js';
 import categoryRoutes from './routes/categories.js';
 import orderRoutes from './routes/orders.js';
+import paymentRoutes from './routes/payment.js';
 
 const app = express();
 
@@ -26,6 +27,11 @@ app.get('/api/v1/health', (req, res) => {
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/orders', orderRoutes);
+app.use('/api/v1/payment', paymentRoutes);
+
+// Global Error Handler
+import { errorHandler } from './middlewares/errorHandler.js';
+app.use(errorHandler);
 
 // Start Server
 /**

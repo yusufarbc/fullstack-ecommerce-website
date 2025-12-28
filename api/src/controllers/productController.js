@@ -1,10 +1,12 @@
+import { asyncHandler } from '../utils/asyncHandler.js';
+
 /**
  * Controller for handling Product HTTP requests.
  */
 export class ProductController {
     /**
      * Creates an instance of ProductController.
-     * @param {ProductService} productService - The product service instance.
+     * @param {import('../services/productService.js').ProductService} productService - The product service instance.
      */
     constructor(productService) {
         this.productService = productService;
@@ -12,37 +14,32 @@ export class ProductController {
 
     /**
      * Handles the request to get all products.
-     * @param {Object} req - The Express request object.
-     * @param {Object} res - The Express response object.
+     * 
+     * @param {import('express').Request} req - The Express request object.
+     * @param {import('express').Response} res - The Express response object.
+     * @param {import('express').NextFunction} next - The Express next function.
      */
-    getProducts = async (req, res) => {
-        try {
-            const products = await this.productService.getAllProducts();
-            res.json(products);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    };
+    getProducts = asyncHandler(async (req, res, next) => {
+        const products = await this.productService.getAllProducts();
+        res.json(products);
+    });
 
     /**
      * Handles the request to get a single product by ID.
-     * @param {Object} req - The Express request object.
-     * @param {Object} res - The Express response object.
+     * 
+     * @param {import('express').Request} req - The Express request object.
+     * @param {import('express').Response} res - The Express response object.
+     * @param {import('express').NextFunction} next - The Express next function.
      */
-    getProduct = async (req, res) => {
-        try {
-            const { id } = req.params;
-            const product = await this.productService.getProductById(id);
+    getProduct = asyncHandler(async (req, res, next) => {
+        const { id } = req.params;
+        const product = await this.productService.getProductById(id);
 
-            if (!product) {
-                return res.status(404).json({ error: 'Product not found' });
-            }
-
-            res.json(product);
-        } catch (error) {
-            console.error('Error fetching product:', error);
-            res.status(500).json({ error: 'Internal server error' });
+        if (!product) {
+            // Alternatively, one could throw a NotFoundError if custom error classes were defined
+            return res.status(404).json({ error: 'Product not found' });
         }
-    };
+
+        res.json(product);
+    });
 }

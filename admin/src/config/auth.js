@@ -8,17 +8,22 @@ const pgSession = connectPgSimple(session);
 /**
  * Configures the authenticated router for AdminJS.
  * 
- * @param {Object} admin - The initialized AdminJS instance.
- * @param {Object} prisma - The Prisma Client instance.
- * @returns {Object} The Express router handling AdminJS routes and authentication.
+ * @param {import('adminjs').default} admin - The initialized AdminJS instance.
+ * @param {import('@prisma/client').PrismaClient} prisma - The Prisma Client instance.
+ * @returns {import('express').Router} The Express router handling AdminJS routes and authentication.
  */
 export const buildAdminRouter = (admin, prisma) => {
     return AdminJSExpress.buildAuthenticatedRouter(admin, {
         authenticate: async (email, password) => {
             try {
+                console.log(`Attempting login for: ${email}`);
                 const user = await prisma.user.findUnique({ where: { email } });
+                console.log(`User found: ${!!user}`);
+                if (user) console.log(`User Logged Role: ${user.role}`);
+
                 if (user && user.role === 'ADMIN') {
                     const matched = await bcrypt.compare(password, user.password);
+                    console.log(`Password match: ${matched}`);
                     if (matched) {
                         return user;
                     }

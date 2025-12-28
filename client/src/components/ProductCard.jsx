@@ -1,6 +1,15 @@
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
+import { ShoppingCart } from 'lucide-react';
 
+/**
+ * ProductCard Component.
+ * Displays product snippet (image, name, price, stock) and add-to-cart button.
+ * 
+ * @param {Object} props - Component props.
+ * @param {Object} props.product - The product object to display.
+ * @returns {JSX.Element} The rendered component.
+ */
 export function ProductCard({ product }) {
     const { addToCart } = useCart();
 

@@ -2,7 +2,15 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
 
+/**
+ * CartContext Provider.
+ * Manages the shopping cart state, including items, sidebar visibility, and totals.
+ * 
+ * @param {Object} props - Component props.
+ * @param {React.ReactNode} props.children - Child components.
+ */
 export function CartProvider({ children }) {
+    // ... implementation ...
     const [cartItems, setCartItems] = useState(() => {
         const savedCart = localStorage.getItem('cart');
         return savedCart ? JSON.parse(savedCart) : [];
@@ -13,6 +21,10 @@ export function CartProvider({ children }) {
         localStorage.setItem('cart', JSON.stringify(cartItems));
     }, [cartItems]);
 
+    /**
+     * Adds a product to the cart.
+     * @param {Object} product - The product to add.
+     */
     const addToCart = (product) => {
         setCartItems((prev) => {
             const existing = prev.find((item) => item.id === product.id);
@@ -26,10 +38,19 @@ export function CartProvider({ children }) {
         setIsSidebarOpen(true);
     };
 
+    /**
+     * Removes a product from the cart by ID.
+     * @param {string} productId - The product ID to remove.
+     */
     const removeFromCart = (productId) => {
         setCartItems((prev) => prev.filter((item) => item.id !== productId));
     };
 
+    /**
+     * Updates the quantity of a cart item.
+     * @param {string} productId - The product ID.
+     * @param {number} delta - The change in quantity (+1 or -1).
+     */
     const updateQuantity = (productId, delta) => {
         setCartItems((prev) =>
             prev.map((item) => {
@@ -70,4 +91,8 @@ export function CartProvider({ children }) {
     );
 }
 
+/**
+ * Custom hook to use the CartContext.
+ * @returns {Object} The cart context value including state and methods.
+ */
 export const useCart = () => useContext(CartContext);

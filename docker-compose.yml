@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15-alpine
@@ -23,13 +21,17 @@ services:
     restart: always
     ports:
       - "8080:8080"
+    volumes:
+      - ./api:/app
+      - /app/node_modules
     environment:
       NODE_ENV: development
       PORT: 8080
       DATABASE_URL: postgres://postgres:password@db:5432/ecommerce?schema=public
       CLIENT_URL: http://localhost:3000
-      IYZICO_API_KEY: "dummy"
-      IYZICO_SECRET_KEY: "dummy"
+      IYZICO_API_KEY: "sandbox-QkxJQlWLVMofySQoG6ZpyYHFVI7coBrB"
+      IYZICO_SECRET_KEY: "sandbox-OOASFgPfXr8YDm9BVuqCFcXMo61ZynIB"
+      IYZICO_BASE_URL: "https://sandbox-api.iyzipay.com"
       BREVO_API_KEY: "dummy"
     depends_on:
       db:
@@ -47,8 +49,10 @@ services:
       NODE_ENV: development
       PORT: 8081
       DATABASE_URL: postgres://postgres:password@db:5432/ecommerce?schema=public
-      SESSION_SECRET: adminsecretkey789
-      COOKIE_PASSWORD: securecookiepassword1234567890123
+      SESSION_SECRET: "supersecret"
+      COOKIE_PASSWORD: "securecookiepassword1234567890123"
+      ADMIN_EMAIL: "admin@siten.com"
+      ADMIN_PASSWORD: "Admin123!"
     depends_on:
       db:
         condition: service_healthy

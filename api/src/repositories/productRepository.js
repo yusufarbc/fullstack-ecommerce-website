@@ -7,7 +7,7 @@ import { BaseRepository } from './baseRepository.js';
 export class ProductRepository extends BaseRepository {
     /**
      * Creates an instance of ProductRepository.
-     * @param {Object} dbClient - The database client (PrismaClient).
+     * @param {import('@prisma/client').PrismaClient} dbClient - The database client (PrismaClient).
      */
     constructor(dbClient) {
         super(dbClient.product);
@@ -15,7 +15,7 @@ export class ProductRepository extends BaseRepository {
 
     /**
      * Retrieves all products including their associated category.
-     * @returns {Promise<Array>} A promise that resolves to an array of products with categories.
+     * @returns {Promise<Array<import('@prisma/client').Product & { category: import('@prisma/client').Category }>>} A promise that resolves to an array of products with categories.
      */
     async findAllWithCategories() {
         return this.findAll({
@@ -29,7 +29,7 @@ export class ProductRepository extends BaseRepository {
     /**
      * Finds products with stock level below or equal to a threshold.
      * @param {number} [threshold=10] - The stock threshold.
-     * @returns {Promise<Array>} A promise that resolves to an array of products.
+     * @returns {Promise<Array<import('@prisma/client').Product>>} A promise that resolves to an array of products.
      */
     async findByStockLow(threshold = 10) {
         return this.model.findMany({

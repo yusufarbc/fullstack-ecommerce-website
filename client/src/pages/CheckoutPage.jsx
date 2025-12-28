@@ -51,14 +51,10 @@ export function CheckoutPage() {
                 }
             });
 
-            if (response.data.status === 'success') {
-                // If Iyzico returns a 3D Secure redirect URL, we would redirect here.
-                // window.location.href = response.data.paymentPageUrl;
-                alert('Payment Successful! Order ID: ' + response.data.orderId);
-                // clearCart();
-                // navigate('/success');
+            if (response.data.status === 'success' && response.data.paymentPageUrl) {
+                window.location.href = response.data.paymentPageUrl;
             } else {
-                alert('Payment Failed');
+                alert('Payment Failed: ' + (response.data.errorMessage || 'Unknown error'));
             }
 
         } catch (error) {

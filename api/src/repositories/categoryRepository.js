@@ -7,7 +7,7 @@ import { BaseRepository } from './baseRepository.js';
 export class CategoryRepository extends BaseRepository {
     /**
      * Creates an instance of CategoryRepository.
-     * @param {Object} dbClient - The database client (PrismaClient).
+     * @param {import('@prisma/client').PrismaClient} dbClient - The database client (PrismaClient).
      */
     constructor(dbClient) {
         super(dbClient.category);
