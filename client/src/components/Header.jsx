@@ -36,7 +36,7 @@ export function Header() {
                 <div className="flex-1 max-w-md mx-8 hidden sm:block relative">
                     <input
                         type="text"
-                        placeholder="Search products..."
+                        placeholder="Ürün ara..."
                         className="w-full border border-gray-300 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
                         onKeyDown={handleSearch}
                     />

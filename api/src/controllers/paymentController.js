@@ -24,7 +24,8 @@ export class PaymentController {
     handleCallback = asyncHandler(async (req, res, next) => {
         console.log('Payment Callback Received:', req.body);
         // Iyzico allows POST request for callback
-        const { token } = req.body;
+        // Token typically comes in body for POST, but checking query just in case
+        const token = req.body?.token || req.query?.token;
 
         if (!token) {
             throw new Error('Token missing in callback');
@@ -34,7 +35,9 @@ export class PaymentController {
 
         if (result.status === 'success') {
             // Redirect to Frontend Success Page
-            res.redirect(`${process.env.CLIENT_URL}/payment/success?orderId=${result.orderId}`);
+            const redirectUrl = `${process.env.CLIENT_URL}/payment/success?orderNumber=${result.orderNumber}&trackingToken=${result.trackingToken}`;
+            console.log('DEBUG: Redirecting to:', redirectUrl);
+            res.redirect(redirectUrl);
         } else {
             res.redirect(`${process.env.CLIENT_URL}/payment/failure?errorMessage=${encodeURIComponent(result.errorMessage)}`);
         }

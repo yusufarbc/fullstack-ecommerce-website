@@ -70,12 +70,12 @@ export function Home() {
             </div>
 
             <h1 className="text-2xl font-bold text-gray-900 mb-6">
-                {selectedCategory ? 'Category Results' : 'Featured Products'}
+                {selectedCategory ? 'Kategori Sonuçları' : 'Öne Çıkan Ürünler'}
             </h1>
 
             {filteredProducts.length === 0 ? (
                 <div className="text-center py-12">
-                    <p className="text-gray-500 text-lg">No products found in this category.</p>
+                    <p className="text-gray-500 text-lg">Bu kategoride ürün bulunamadı.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

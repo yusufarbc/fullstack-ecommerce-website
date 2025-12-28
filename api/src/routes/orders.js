@@ -3,6 +3,11 @@ import { orderController } from '../container.js';
 
 const router = express.Router();
 
-router.post('/checkout', orderController.createCheckoutSession);
+import { validateRequest } from '../middlewares/validationMiddleware.js';
+import { checkoutSchema } from '../validators/orderValidator.js';
+
+router.post('/checkout', validateRequest(checkoutSchema), orderController.createCheckoutSession);
+router.get('/track', orderController.trackOrder);
+router.get('/:id', orderController.getOrderById);
 
 export default router;

@@ -33,6 +33,10 @@ fullstack-ecommerce-website/
 
 ## 🚀 Tech Stack
 
+### 💻 Software Development Stack
+This project is built using the **PERN Stack** (PostgreSQL, Express, React, Node.js), a robust full-stack solution for modern web applications.
+[Learn more about PERN Stack](https://www.geeksforgeeks.org/node-js/what-is-pern-stack/)
+
 ### Backend
 - **Node.js** 18 (Alpine)
 - **Express.js** - Web framework
@@ -40,7 +44,7 @@ fullstack-ecommerce-website/
 - **PostgreSQL 15** - Database
 - **AdminJS** - Auto-generated admin panel
 - **bcrypt** - Password hashing
-- **JWT** - Authentication
+- **Session/Cookie** - Admin Authentication
 - **Helmet** - Security headers
 - **Zod** - Validation
 
@@ -187,42 +191,34 @@ model User {
 }
 
 enum UserRole {
-  ADMIN
-  USER
-  CUSTOMER
+  ADMIN     // For Admin Panel access
+  USER      // Unused / Reserved
+  CUSTOMER  // Unused (Guest checkout only)
 }
 ```
 
-## 🔐 Authentication Flow
+> **Note**: The `User` table is currently used primarily for Administrators. Customers do not have accounts.
 
-### JWT Token Strategy
+## 🔐 Authentication & Checkout Flow
 
-1. **Login**: User sends credentials to `/api/v1/auth/login`
-2. **Token Generation**: Backend creates JWT token
-3. **Token Storage**: Frontend stores token in `localStorage`
-4. **Axios Interceptor**: Automatically adds `Authorization: Bearer <TOKEN>` to all requests
-5. **Token Validation**: Backend validates token on protected routes
+### 1. Admin Authentication (Admin Panel Only)
+- The **Admin Panel** (`/admin`) is a completely separate service running in its own container.
+- It handles its own session-based authentication for administrators.
+- **Credentials**: Managed via environment variables or the database.
 
-### Axios Interceptor (`client/src/lib/axios.js`)
+### 2. Customer Guest Checkout (Client)
+- The **Client** application is a public-facing store that requires **NO authentication**.
+- Customers browse products and checkout as **Guests**.
+- No user registration or login functionality exists for customers.
+- This ensures a fast, friction-free shopping experience.
 
-```javascript
-// Automatically adds JWT token to every request
-axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-```
+## 🎨 Admin Panel
+The Admin Panel runs independently on port `8081` (default).
 
-## 🎨 AdminJS Features
-
-- **Auto-generated CRUD** for User model
-- **Password field hidden** in list/show views
-- **Custom branding** (E-Commerce Admin)
-- **Accessible at** `/admin` route
-- **Integrated** with Prisma ORM
+- **URL**: `http://localhost:8081/admin`
+- **Features**: Product management, Order viewing, Category management.
+- **Technology**: AdminJS running on a dedicated Express server.
+- **Independence**: It does not share session state with the Client or API.
 
 ## 🐳 Docker Services
 

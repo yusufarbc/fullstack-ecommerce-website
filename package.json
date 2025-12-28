@@ -1,0 +1,12 @@
+{
+    "name": "ecommerce-root",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "concurrently -n \"API,CLIENT,ADMIN\" -c \"blue,green,magenta\" \"npm run dev --prefix api\" \"npm run dev --prefix client\" \"npm run dev --prefix admin\"",
+        "install:all": "npm install && npm install --prefix api && npm install --prefix client && npm install --prefix admin"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.0"
+    }
+}

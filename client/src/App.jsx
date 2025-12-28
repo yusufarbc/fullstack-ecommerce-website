@@ -1,6 +1,8 @@
 import { Home } from './pages/Home';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { ProductDetail } from './pages/ProductDetail';
+import { OrderDetail } from './pages/OrderDetail';
+import OrderTrackingPage from './pages/OrderTrackingPage';
 import { PaymentSuccess } from './pages/PaymentSuccess';
 import { PaymentFailure } from './pages/PaymentFailure';
 import { CartProvider } from './context/CartContext';
@@ -19,6 +21,8 @@ function App() {
                             <Route path="/" element={<Home />} />
                             <Route path="/checkout" element={<CheckoutPage />} />
                             <Route path="/product/:id" element={<ProductDetail />} />
+                            <Route path="/order/:id" element={<OrderDetail />} />
+                            <Route path="/siparis-takip" element={<OrderTrackingPage />} />
                             <Route path="/payment/success" element={<PaymentSuccess />} />
                             <Route path="/payment/failure" element={<PaymentFailure />} />
                         </Routes>

@@ -11,10 +11,21 @@ export default defineConfig({
         port: 3000,
         proxy: {
             '/api': {
-                target: 'http://api:8080',
+                target: 'http://localhost:8080',
                 changeOrigin: true,
                 secure: false,
             }
         }
+    },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom', 'react-router-dom'],
+                    ui: ['lucide-react', 'clsx']
+                }
+            }
+        },
+        chunkSizeWarningLimit: 1000
     }
 })

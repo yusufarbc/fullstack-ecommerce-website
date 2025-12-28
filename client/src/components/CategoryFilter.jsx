@@ -35,7 +35,7 @@ export function CategoryFilter({ onCategorySelect, selectedCategory }) {
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
             >
-                All Products
+                Tüm Ürünler
             </button>
             {categories.map((category) => (
                 <button

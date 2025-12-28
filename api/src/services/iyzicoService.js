@@ -48,7 +48,7 @@ export class IyzicoService {
             currency: Iyzipay.CURRENCY.TRY,
             basketId: order.id.toString(),
             paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
-            callbackUrl: `${process.env.VITE_API_URL}/api/v1/payment/callback`,
+            callbackUrl: `${process.env.API_URL || 'http://localhost:8080'}/api/v1/payment/callback`,
             enabledInstallments: [1, 2, 3, 6, 9],
             buyer: {
                 id: buyer.id || 'guest',
@@ -66,18 +66,20 @@ export class IyzicoService {
                 zipCode: buyer.zipCode || '34732'
             },
             shippingAddress: {
-                contactName: buyer.name || 'Guest',
-                city: buyer.city || 'Istanbul',
-                country: buyer.country || 'Turkey',
-                address: buyer.address || 'Istanbul',
-                zipCode: buyer.zipCode || '34732'
+                contactName: buyer.name + ' ' + buyer.surname,
+                city: buyer.city,
+                country: buyer.country,
+                address: buyer.address,
+                district: buyer.district, // Explicit district
+                zipCode: buyer.zipCode
             },
             billingAddress: {
-                contactName: buyer.name || 'Guest',
-                city: buyer.city || 'Istanbul',
-                country: buyer.country || 'Turkey',
-                address: buyer.address || 'Istanbul',
-                zipCode: buyer.zipCode || '34732'
+                contactName: buyer.name + ' ' + buyer.surname,
+                city: buyer.city,
+                country: buyer.country,
+                address: buyer.address,
+                district: buyer.district,
+                zipCode: buyer.zipCode
             },
             basketItems: basketItems.flatMap(item => {
                 const items = [];
@@ -123,7 +125,6 @@ export class IyzicoService {
         return new Promise((resolve, reject) => {
             this.iyzipay.checkoutForm.retrieve({
                 locale: Iyzipay.LOCALE.TR,
-                conversationId: '123456789', // Should ideally match the start request
                 token: token
             }, (err, result) => {
                 if (err) {

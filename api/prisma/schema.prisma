@@ -10,6 +10,9 @@ datasource db {
 
 enum OrderStatus {
   PENDING
+  PREPARING
+  SHIPPED
+  DELIVERED
   COMPLETED
   CANCELLED
 }
@@ -20,16 +23,7 @@ enum InvoiceStatus {
   PAID
 }
 
-// User table for Admin access only.
-// The API service does not use this, but it is required for DB schema consistency.
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  role      String   @default("ADMIN")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+
 
 
 model Product {
@@ -61,17 +55,28 @@ model Order {
   status        OrderStatus   @default(PENDING)
   invoiceStatus InvoiceStatus @default(NOT_ISSUED)
   
-  // Guest & Shipping Info
-  guestEmail    String?
-  guestName     String?
-  guestSurname  String?
-  guestPhone    String?
-  address       String?       // Shipping address
-  city          String?
-  zipCode       String?
+  // Customer & Shipping Info
+  email         String
+  name          String
+  surname       String
+  phone         String        // E.g. +905XXXXXXXXX
+  orderNumber   String        @unique // Short readable ID for tracking e.g. S-123456
+  trackingToken String?       @unique // Secure Token for tracking links (UUID)
+  address       String        // Mahalle, sokak, no bilgisi
+  city          String        // Iyzico: city
+  district      String        // Iyzico: district
+  zipCode       String        // Iyzico: zipCode
+  country       String        @default("Turkey") // Iyzico: country
+  
+  // Corporate Invoice Info
+  isCorporate   Boolean       @default(false)
+  companyName   String?
+  taxOffice     String?
+  taxNumber     String?
   
   // Payment Info (Iyzico)
   paymentId     String?
+  paymentToken  String?       @unique // Iyzico Token for callback lookup
   paymentStatus String?       @default("PENDING") // SUCCESS, FAILURE
   
   createdAt     DateTime      @default(now())

@@ -1,12 +1,13 @@
-import AdminJS from 'adminjs';
+import AdminJS, { ComponentLoader } from 'adminjs';
 import { Database, Resource } from '@adminjs/prisma';
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-import { getAdminResources } from './src/config/resources.js';
-import { buildAdminRouter } from './src/config/auth.js';
+import { locale } from './config/locale.js';
+import { getAdminResources } from './config/resources.js';
+import { buildAdminRouter } from './config/auth.js';
 
 dotenv.config();
 
@@ -25,13 +26,17 @@ const start = async () => {
     AdminJS.registerAdapter({ Database, Resource });
 
     // 2. AdminJS Configuration
+    const componentLoader = new ComponentLoader();
+
     const adminOptions = {
-        resources: getAdminResources(prisma),
+        componentLoader,
+        resources: getAdminResources(prisma, componentLoader),
         rootPath: '/admin',
         branding: {
-            companyName: 'Store Admin',
-            logo: false, // Or path to logo
-        }
+            companyName: 'Mağaza Yönetimi',
+            logo: false,
+        },
+        locale: locale
     };
     const admin = new AdminJS(adminOptions);
 

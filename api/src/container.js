@@ -36,7 +36,7 @@ const orderRepository = new OrderRepository(prisma);
 
 // Infrastructure Services
 const iyzicoService = new IyzicoService(config.iyzico);
-const emailService = new EmailService(BREVO_API_KEY);
+const emailService = new EmailService(config.brevo.smtp);
 
 // Domain Services
 const productService = new ProductService(productRepository);

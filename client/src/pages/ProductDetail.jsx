@@ -19,7 +19,7 @@ export function ProductDetail() {
                 setProduct(response.data);
             } catch (err) {
                 console.error(err);
-                setError('Failed to load product details.');
+                setError('Ürün detayları yüklenemedi.');
             } finally {
                 setLoading(false);
             }
@@ -36,12 +36,12 @@ export function ProductDetail() {
 
     if (error || !product) return (
         <div className="max-w-7xl mx-auto px-4 py-8 text-center">
-            <p className="text-red-500 mb-4">{error || 'Product not found'}</p>
+            <p className="text-red-500 mb-4">{error || 'Ürün bulunamadı'}</p>
             <button
                 onClick={() => navigate('/')}
                 className="text-blue-600 hover:underline flex items-center justify-center gap-2"
             >
-                <ArrowLeft size={16} /> Back to Products
+                <ArrowLeft size={16} /> Ürünlere Geri Dön
             </button>
         </div>
     );
@@ -52,7 +52,7 @@ export function ProductDetail() {
                 onClick={() => navigate(-1)}
                 className="mb-8 text-gray-500 hover:text-gray-900 flex items-center gap-2 transition"
             >
-                <ArrowLeft size={20} /> Back
+                <ArrowLeft size={20} /> Geri
             </button>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -65,17 +65,17 @@ export function ProductDetail() {
                             className="w-full h-full object-contain"
                         />
                     ) : (
-                        <span className="text-gray-400">No Image Available</span>
+                        <span className="text-gray-400">Görsel Mevcut Değil</span>
                     )}
                 </div>
 
                 {/* Info Section */}
                 <div className="flex flex-col justify-center">
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
-                    <p className="text-2xl font-semibold text-blue-600 mb-6">${Number(product.price).toFixed(2)}</p>
+                    <p className="text-2xl font-semibold text-blue-600 mb-6">₺{Number(product.price).toFixed(2)}</p>
 
                     <div className="prose prose-lg text-gray-600 mb-8">
-                        <p>{product.description || 'No description available for this product.'}</p>
+                        <p>{product.description || 'Bu ürün için açıklama bulunmuyor.'}</p>
                     </div>
 
                     <div className="flex items-center gap-4 border-t pt-8">
@@ -84,12 +84,12 @@ export function ProductDetail() {
                             className="flex-1 bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center justify-center gap-3 active:scale-95 transform duration-100"
                         >
                             <ShoppingCart size={24} />
-                            Add to Cart
+                            Sepete Ekle
                         </button>
                     </div>
 
                     <div className="mt-6 text-sm text-gray-500">
-                        Category: <span className="font-medium text-gray-900">{product.category ? product.category.name : 'General'}</span>
+                        Kategori: <span className="font-medium text-gray-900">{product.category ? product.category.name : 'Genel'}</span>
                     </div>
                 </div>
             </div>

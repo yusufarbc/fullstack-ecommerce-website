@@ -17,17 +17,24 @@ export const buildAdminRouter = (admin, prisma) => {
         authenticate: async (email, password) => {
             try {
                 console.log(`Attempting login for: ${email}`);
-                const user = await prisma.user.findUnique({ where: { email } });
-                console.log(`User found: ${!!user}`);
-                if (user) console.log(`User Logged Role: ${user.role}`);
 
-                if (user && user.role === 'ADMIN') {
-                    const matched = await bcrypt.compare(password, user.password);
-                    console.log(`Password match: ${matched}`);
-                    if (matched) {
-                        return user;
+                // Hardcoded Env Auth (No DB User Table)
+                const adminEmail = process.env.ADMIN_EMAIL;
+                const adminPassword = process.env.ADMIN_PASSWORD;
+
+                if (email === adminEmail) {
+                    // In a real app we might hash the env var too, but for simplicity/request:
+                    // Check if password matches (assuming Env is plain text or we compare plain)
+                    // If the user wants bcrypt compare, the Env should store the hash.
+                    // But typically 'hardcoded' means plain text check for simple apps.
+                    // Let's assume plain text check since docker-compose has 'Admin123!'
+
+                    if (password === adminPassword) {
+                        return { email: adminEmail, role: 'ADMIN' };
                     }
                 }
+
+                return false;
                 return false;
             } catch (error) {
                 console.error("Authentication Error:", error);

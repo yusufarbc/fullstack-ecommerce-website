@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
 import { config } from './config.js';
 import prisma from './prisma.js';
 import productRoutes from './routes/products.js';
@@ -17,6 +18,8 @@ app.use(cors({
 app.use(helmet({
     contentSecurityPolicy: false, // Disabled for AdminJS compatibility
 }));
+app.use(compression());
+app.use(express.urlencoded({ extended: true })); // Required for Iyzico Callback
 app.use(express.json());
 
 // Routes

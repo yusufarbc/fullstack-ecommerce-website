@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 /**
  * Service for handling Order business logic including checkout and payment processing.
  */
@@ -22,7 +23,8 @@ export class OrderService {
      * @returns {Promise<Object>} The result of the checkout process.
      */
     async processCheckout(checkoutData) {
-        const { items, guestInfo } = checkoutData;
+        // Renaming guestInfo to customerInfo for consistency
+        const { items, guestInfo: customerInfo } = checkoutData;
 
         // 1. Calculate and Validate Total
         let totalAmount = 0;
@@ -54,14 +56,47 @@ export class OrderService {
         }
 
         // 2. Create Pending Order
+        const { isCorporate, companyName, taxOffice, taxNumber } = checkoutData.invoiceInfo || {};
+
+        // Generate Short Order Number (e.g. 738492)
+        const orderNumber = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Split Full Name
+        const fullNameParts = customerInfo.name.trim().split(' ');
+        const surname = fullNameParts.length > 1 ? fullNameParts.pop() : '';
+        const name = fullNameParts.join(' ');
+
+        // Format Phone (+90...)
+        let rawPhone = customerInfo.phone.replace(/\s/g, ''); // Remove spaces
+        if (rawPhone.startsWith('0')) {
+            rawPhone = '+90' + rawPhone.substring(1);
+        } else if (!rawPhone.startsWith('+')) {
+            rawPhone = '+90' + rawPhone; // Assume 5XX... -> +905XX...
+        }
+
+        const country = 'Turkey';
+
+        // Generate Secure Tracking Token (UUID)
+        const trackingToken = crypto.randomUUID();
+
         const orderData = {
             totalAmount,
             status: 'PENDING',
-            guestName: guestInfo.name,
-            guestEmail: guestInfo.email,
-            address: guestInfo.address,
-            city: guestInfo.city,
-            zipCode: guestInfo.zipCode,
+            orderNumber: orderNumber,
+            trackingToken: trackingToken,
+            name: name || customerInfo.name, // Fallback to full name if split fails
+            surname: surname,
+            email: customerInfo.email,
+            phone: rawPhone,
+            address: customerInfo.address,
+            city: customerInfo.city,
+            district: customerInfo.district,
+            zipCode: customerInfo.zipCode,
+            country: country,
+            isCorporate: !!isCorporate,
+            companyName: companyName || null,
+            taxOffice: taxOffice || null,
+            taxNumber: taxNumber || null,
             items: {
                 create: indexItems
             }
@@ -71,7 +106,30 @@ export class OrderService {
 
         // 3. Process Payment via Iyzico
         try {
-            const paymentResult = await this.iyzicoService.startPaymentProcess(order, iyzicoItems, guestInfo);
+            // Transform customerInfo to Iyzico Buyer format
+            const buyer = {
+                id: 'customer-' + order.id,
+                name: name || 'Guest',
+                surname: surname || 'User',
+                email: customerInfo.email,
+                phone: rawPhone,
+                address: customerInfo.address,
+                city: customerInfo.city,
+                district: customerInfo.district, // Passing district to Iyzico Service
+                country: country,
+                zipCode: customerInfo.zipCode,
+                ip: '127.0.0.1' // In production, get this from request headers
+            };
+
+            const paymentResult = await this.iyzicoService.startPaymentProcess(order, iyzicoItems, buyer);
+
+            // Save the token to the order for robust callback handling
+            await this.orderRepository.updatePaymentToken(order.id, paymentResult.token);
+
+            // Save the token to the order for robust callback handling
+            if (paymentResult.token) {
+                await this.orderRepository.updatePaymentToken(order.id, paymentResult.token);
+            }
 
             // Return the payment page URL for client redirect
             return {
@@ -98,30 +156,42 @@ export class OrderService {
             const result = await this.iyzicoService.retrievePaymentResult(token);
 
             if (result.status === 'success' && result.paymentStatus === 'SUCCESS') {
-                // 2. Find Order (using conversationId which we set as orderId, or paymentId)
-                // Note: iyzicoService.js sets conversationId = order.id
-                // But retrievePaymentResult returns rawResult.conversationId
+                // 2. Find Order using the Payment Token (Most Robust Way)
+                console.log('Completing payment for Token:', token);
 
-                // Let's assume we can trust the token verification to mean the payment is done.
-                // We need the Order ID.
-                const orderId = parseInt(result.rawResult.conversationId);
+                let order = await this.orderRepository.getOrderByPaymentToken(token);
+                console.log('DEBUG: Order found by token:', order ? { id: order.id, orderNumber: order.orderNumber } : 'null');
 
-                // 3. Update Order to Success
-                await this.orderRepository.updateStatus(orderId, 'SUCCESS', 'COMPLETED');
+                if (!order) {
+                    // Fallback to conversationId if token lookup fails (legacy support or race condition)
+                    const fallbackId = result.rawResult.conversationId;
+                    console.log('Token lookup failed, trying conversationId:', fallbackId);
+                    if (fallbackId) {
+                        order = await this.orderRepository.getOrderById(fallbackId);
+                    }
+                }
 
-                // 4. Retrieve Order details for email (or just use what we have if we fetch it)
-                // For simplicity, we might need to fetch the order again to get guest details.
-                const order = await this.orderRepository.getOrderById(orderId);
+                if (!order) {
+                    throw new Error('Order not found for the given payment token');
+                }
 
-                if (order) {
-                    await this.emailService.sendOrderConfirmation(order.guestEmail, order.guestName, {
-                        id: order.id,
-                        total: order.totalAmount,
-                        items: order.items // This might require include: items
+                // 3. Finalize Order (Transaction: Deduct Stock, Update Status)
+                await this.orderRepository.finalizeOrder(order.id);
+
+                // 4. Retrieve Order details for email (Refresh data)
+                const freshOrder = await this.orderRepository.getOrderById(order.id);
+
+                if (freshOrder) {
+                    await this.emailService.sendOrderConfirmation(freshOrder.email, freshOrder.name, {
+                        id: freshOrder.id,
+                        orderNumber: freshOrder.orderNumber, // Short Code
+                        trackingToken: freshOrder.trackingToken, // Secure Token for link
+                        total: freshOrder.totalAmount,
+                        items: freshOrder.items
                     });
                 }
 
-                return { status: 'success', orderId: orderId };
+                return { status: 'success', orderId: order.id, orderNumber: order.orderNumber, trackingToken: order.trackingToken };
             } else {
                 return { status: 'failure', errorMessage: 'Payment not successful' };
             }
@@ -129,5 +199,32 @@ export class OrderService {
             console.error('Payment Completion Error:', error);
             throw error;
         }
+    }
+
+    /**
+     * Finds an order by its secure tracking token.
+     * @param {string} token - Tracking token.
+     * @returns {Promise<Object>} The order.
+     */
+    async getOrderByTrackingToken(token) {
+        return this.orderRepository.getOrderByTrackingToken(token);
+    }
+
+    /**
+     * Retrieves an order by ID and optionally verifies the email.
+     * @param {number} id - Order ID.
+     * @param {string} [email] - Guest email to verify.
+     * @returns {Promise<Object>} The order object.
+     * @throws {Error} If order not found or email mismatch.
+     */
+    async getOrderById(id, email) {
+        const order = await this.orderRepository.getOrderById(id);
+        if (!order) return null;
+
+        if (email && order.email !== email) {
+            throw new Error('Erişim reddedildi: E-posta adresi eşleşmiyor.');
+        }
+
+        return order;
     }
 }

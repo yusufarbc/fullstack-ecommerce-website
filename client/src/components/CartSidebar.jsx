@@ -29,7 +29,7 @@ export function CartSidebar() {
             <div className="absolute inset-y-0 right-0 max-w-full flex">
                 <div className="w-screen max-w-md bg-white shadow-xl flex flex-col h-full">
                     <div className="flex items-center justify-between px-4 py-6 border-b">
-                        <h2 className="text-lg font-medium text-gray-900">Shopping Cart</h2>
+                        <h2 className="text-lg font-medium text-gray-900">Sepetim</h2>
                         <button
                             onClick={closeSidebar}
                             className="text-gray-400 hover:text-gray-500"
@@ -41,12 +41,12 @@ export function CartSidebar() {
                     <div className="flex-1 overflow-y-auto p-4">
                         {cartItems.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                                <p>Your cart is empty.</p>
+                                <p>Sepetiniz boş.</p>
                                 <button
                                     onClick={closeSidebar}
                                     className="mt-4 text-blue-600 hover:text-blue-500 font-medium"
                                 >
-                                    Continue Shopping
+                                    Alışverişe Devam Et
                                 </button>
                             </div>
                         ) : (
@@ -97,7 +97,7 @@ export function CartSidebar() {
                                                     className="font-medium text-red-600 hover:text-red-500 flex items-center gap-1"
                                                 >
                                                     <Trash2 size={16} />
-                                                    Remove
+                                                    Sil
                                                 </button>
                                             </div>
                                         </div>
@@ -110,10 +110,10 @@ export function CartSidebar() {
                     {cartItems.length > 0 && (
                         <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
                             <div className="flex justify-between text-base font-medium text-gray-900">
-                                <p>Subtotal</p>
-                                <p>${cartTotal.toFixed(2)}</p>
+                                <p>Ara Toplam</p>
+                                <p>₺{cartTotal.toFixed(2)}</p>
                             </div>
-                            <p className="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
+                            <p className="mt-0.5 text-sm text-gray-500">Kargo ve vergiler ödeme adımında hesaplanır.</p>
                             <div className="mt-6">
                                 <button
                                     onClick={() => {
@@ -122,7 +122,7 @@ export function CartSidebar() {
                                     }}
                                     className="w-full flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-blue-700"
                                 >
-                                    Checkout
+                                    Ödemeye Geç
                                 </button>
                             </div>
                         </div>
