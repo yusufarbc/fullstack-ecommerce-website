@@ -76,22 +76,7 @@ export class OrderRepository extends BaseRepository {
 
             if (!order) throw new Error('Order not found');
 
-            // 2. Decrement Stock for each item
-            for (const item of order.items) {
-                // Check current stock first (optional but good practice)
-                const product = await tx.product.findUnique({
-                    where: { id: item.productId }
-                });
 
-                if (product.stock < item.quantity) {
-                    throw new Error(`Stok yetersiz: ${product.name}`);
-                }
-
-                await tx.product.update({
-                    where: { id: item.productId },
-                    data: { stock: { decrement: item.quantity } }
-                });
-            }
 
             // 3. Update Order Status
             return tx.order.update({

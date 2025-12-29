@@ -40,9 +40,7 @@ export function ProductCard({ product }) {
                         <ShoppingCart size={20} />
                     </button>
                 </div>
-                <div className="mt-2 text-sm text-gray-500">
-                    Stok: {product.stock}
-                </div>
+
             </div>
         </div>
     );

@@ -26,18 +26,5 @@ export class ProductRepository extends BaseRepository {
         });
     }
 
-    /**
-     * Finds products with stock level below or equal to a threshold.
-     * @param {number} [threshold=10] - The stock threshold.
-     * @returns {Promise<Array<import('@prisma/client').Product>>} A promise that resolves to an array of products.
-     */
-    async findByStockLow(threshold = 10) {
-        return this.model.findMany({
-            where: {
-                stock: {
-                    lte: threshold
-                }
-            }
-        });
-    }
+
 }

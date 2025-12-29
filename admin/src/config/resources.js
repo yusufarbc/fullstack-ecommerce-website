@@ -34,7 +34,9 @@ export const getAdminResources = (prisma, componentLoader) => {
                         isVisible: { list: true, show: true, edit: true, filter: true }
                     },
                     description: { type: 'richtext' },
-                    categoryId: { isRequired: true }
+
+                    categoryId: { isVisible: false },
+                    category: { isVisible: true, isRequired: true }
                 }
             },
             features: [
