@@ -4,6 +4,8 @@ Complete, production-ready monorepo structure for an E-Commerce application with
 
 ## 🏗️ Architecture
 
+![Architecture Diagram](./etrade_software_arch.png)
+
 ```
 fullstack-ecommerce-website/
 ├── client/                 # React Frontend (Vite + Tailwind)
