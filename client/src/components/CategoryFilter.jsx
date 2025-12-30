@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../lib/axios';
 
 /**
@@ -11,6 +12,7 @@ import api from '../lib/axios';
  * @returns {JSX.Element} The rendered component.
  */
 export function CategoryFilter({ onCategorySelect, selectedCategory }) {
+    const { t } = useTranslation();
     const [categories, setCategories] = useState([]);
 
     useEffect(() => {
@@ -35,7 +37,7 @@ export function CategoryFilter({ onCategorySelect, selectedCategory }) {
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
             >
-                Tüm Ürünler
+                {t('home.allCategories')}
             </button>
             {categories.map((category) => (
                 <button
@@ -46,7 +48,7 @@ export function CategoryFilter({ onCategorySelect, selectedCategory }) {
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                 >
-                    {category.name}
+                    {category.ad}
                 </button>
             ))}
         </div>

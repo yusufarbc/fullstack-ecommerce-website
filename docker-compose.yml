@@ -37,6 +37,7 @@ services:
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USER: ${SMTP_USER}
       SMTP_PASS: ${SMTP_PASS}
+      CDN_URL: ${CDN_URL}
     depends_on:
       db:
         condition: service_healthy
@@ -74,6 +75,7 @@ services:
       - "3000:3000"
     environment:
       - VITE_API_URL=${VITE_API_URL}
+      - PROXY_TARGET=http://api:8080
     depends_on:
       - api
 

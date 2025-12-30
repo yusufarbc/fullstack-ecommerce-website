@@ -8,6 +8,7 @@ import { checkoutSchema } from '../validators/orderValidator.js';
 
 router.post('/checkout', validateRequest(checkoutSchema), orderController.createCheckoutSession);
 router.get('/track', orderController.trackOrder);
+router.post('/cancel', orderController.cancelOrder);
 router.get('/:id', orderController.getOrderById);
 
 export default router;

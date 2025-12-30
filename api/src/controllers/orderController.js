@@ -1,7 +1,7 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 /**
- * Controller for handling Order HTTP requests.
+ * Controller for handling Siparis HTTP requests.
  */
 export class OrderController {
     /**
@@ -32,7 +32,7 @@ export class OrderController {
         const { email } = req.query;
 
         try {
-            const order = await this.orderService.getOrderById(parseInt(id), email);
+            const order = await this.orderService.getOrderById(id, email);
             if (!order) {
                 return res.status(404).json({ message: 'Sipariş bulunamadı' });
             }
@@ -41,6 +41,7 @@ export class OrderController {
             res.status(403).json({ message: error.message });
         }
     });
+
     /**
      * Tracks an order using a secure token.
      * 
@@ -64,16 +65,34 @@ export class OrderController {
         res.json({
             status: 'success',
             data: {
-                orderNumber: order.orderNumber,
-                status: order.status,
-                totalAmount: order.totalAmount,
-                items: order.items,
-                createdAt: order.createdAt,
+                orderNumber: order.siparisNumarasi,
+                status: order.durum,
+                totalAmount: order.toplamTutar,
+                items: order.kalemler,
+                createdAt: order.olusturulmaTarihi,
                 shippingAddress: {
-                    city: order.city,
-                    district: order.district
+                    city: order.sehir,
+                    district: order.ilce
                 }
             }
         });
+    });
+
+    /**
+     * Cancels an order.
+     */
+    cancelOrder = asyncHandler(async (req, res, next) => {
+        const { token, reason } = req.body;
+
+        if (!token) {
+            return res.status(400).json({ status: 'failure', errorMessage: 'Takip kodu (token) gereklidir.' });
+        }
+
+        try {
+            const result = await this.orderService.cancelOrder(token, reason);
+            res.json(result);
+        } catch (error) {
+            return res.status(400).json({ status: 'failure', errorMessage: error.message });
+        }
     });
 }

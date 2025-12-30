@@ -1,5 +1,6 @@
 import { getModelByName } from '@adminjs/prisma';
 import uploadFeature from '@adminjs/upload';
+import { v4 as uuidv4 } from 'uuid';
 import { R2CustomProvider } from '../utils/r2-provider.js';
 
 /**
@@ -12,10 +13,9 @@ import { R2CustomProvider } from '../utils/r2-provider.js';
  */
 export const getAdminResources = (prisma, componentLoader) => {
     return [
-
         {
             resource: {
-                model: getModelByName('Product'),
+                model: getModelByName('Urun'),
                 client: prisma
             },
             options: {
@@ -24,27 +24,33 @@ export const getAdminResources = (prisma, componentLoader) => {
                     icon: 'ShoppingBag',
                 },
                 properties: {
-                    // Labels handled by locale, but forcing specific UI behaviors here
-                    name: { isTitle: true },
-                    price: { type: 'currency', props: { symbol: '₺', decimalSeparator: ',', groupSeparator: '.' } },
-                    imageUrl: {
+                    ad: { isTitle: true },
+                    fiyat: { type: 'number', isRequired: true },
+                    resimUrl: {
                         isVisible: false // Hide the raw URL field in forms
                     },
                     imageFile: {
                         isVisible: { list: true, show: true, edit: true, filter: true }
                     },
-                    description: { type: 'richtext' },
-
-                    categoryId: { isVisible: false },
-                    category: { isVisible: true, isRequired: true }
+                    aciklama: { type: 'richtext' },
+                    kategoriId: { isVisible: false },
+                    kategori: { isVisible: true, isRequired: true },
+                    olusturulmaTarihi: { isVisible: { list: true, show: true, filter: true, edit: false, new: false } },
+                    guncellenmeTarihi: { isVisible: { list: true, show: true, filter: true, edit: false, new: false } }
                 }
             },
             features: [
                 uploadFeature({
                     provider: new R2CustomProvider(),
                     componentLoader,
+                    // In version 4 of @adminjs/upload, we use uploadPath
+                    uploadPath: (record, filename) => {
+                        const ext = filename.split('.').pop();
+                        // Even though we convert to webp in provider, we should save as webp in DB
+                        return `products/img_${uuidv4()}.webp`;
+                    },
                     properties: {
-                        key: 'imageUrl', // Map to the database column 'imageUrl'
+                        key: 'resimUrl', // Map to the database column 'resimUrl'
                         file: 'imageFile', // Virtual field for the file input
                     },
                     validation: {
@@ -55,19 +61,24 @@ export const getAdminResources = (prisma, componentLoader) => {
         },
         {
             resource: {
-                model: getModelByName('Category'),
+                model: getModelByName('Kategori'),
                 client: prisma
             },
             options: {
                 navigation: {
                     name: 'Mağaza Yönetimi',
                     icon: 'Folder',
+                },
+                properties: {
+                    ad: { isTitle: true },
+                    olusturulmaTarihi: { isVisible: { list: true, show: true, filter: true, edit: false, new: false } },
+                    guncellenmeTarihi: { isVisible: { list: true, show: true, filter: true, edit: false, new: false } }
                 }
             }
         },
         {
             resource: {
-                model: getModelByName('Order'),
+                model: getModelByName('Siparis'),
                 client: prisma
             },
             options: {
@@ -76,10 +87,16 @@ export const getAdminResources = (prisma, componentLoader) => {
                     icon: 'ShoppingCart',
                 },
                 properties: {
-                    totalAmount: { type: 'currency', props: { symbol: '₺' } },
-                    orderNumber: { isTitle: true },
-                    trackingToken: { isVisible: { list: false, edit: false, show: true, filter: false } },
-                    items: { isVisible: { list: false, edit: false, show: true, filter: false } }
+                    id: { isVisible: false },
+                    toplamTutar: { type: 'currency', props: { symbol: '₺' } },
+                    siparisNumarasi: { isTitle: true, isVisible: { list: true, show: true, edit: false, new: false, filter: true } },
+                    takipTokeni: { isVisible: { list: false, edit: false, show: true, new: false, filter: false } },
+                    odemeId: { isVisible: { list: false, edit: false, show: true, new: false, filter: false } },
+                    odemeTokeni: { isVisible: { list: false, edit: false, show: true, new: false, filter: false } },
+                    odemeDurumu: { isVisible: { list: true, edit: true, show: true, new: false, filter: true } },
+                    kalemler: { isVisible: { list: false, edit: false, show: true, filter: false } },
+                    olusturulmaTarihi: { isVisible: { list: true, show: true, filter: true, edit: false, new: false } },
+                    guncellenmeTarihi: { isVisible: { list: true, show: true, filter: true, edit: false, new: false } }
                 }
             }
         },

@@ -19,12 +19,16 @@ const BUCKET_NAME = process.env.R2_BUCKET_NAME;
 export class R2CustomProvider extends BaseProvider {
     constructor() {
         super(BUCKET_NAME);
+        console.log('R2CustomProvider initialized with bucket:', BUCKET_NAME);
     }
 
     // 1. UPLOAD FUNCTION
     async upload(file, key) {
-        // Standard Naming: products/img_UUID.webp
-        const standardName = `products/img_${uuidv4()}.webp`;
+        console.log('R2 Uploading file:', file.name, 'with suggested key:', key);
+
+        // Use suggested key if provided and valid, otherwise generate one
+        const standardName = key || `products/img_${uuidv4()}.webp`;
+        console.log('Final standardized name to use:', standardName);
 
         // Process with Sharp (Resize + WebP)
         let buffer;
@@ -46,12 +50,12 @@ export class R2CustomProvider extends BaseProvider {
             Bucket: BUCKET_NAME,
             Key: standardName,
             Body: buffer,
-            ContentType: 'image/webp',
-            ACL: 'public-read' // Check R2 specific ACL support, usually handled by bucket policy
+            ContentType: 'image/webp'
         };
 
         await r2.send(new PutObjectCommand(uploadParams));
 
+        console.log('R2 Upload successful. Returning key to save in DB:', standardName);
         // Return the key to be saved in DB
         return standardName;
     }

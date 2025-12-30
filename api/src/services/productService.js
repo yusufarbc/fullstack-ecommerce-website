@@ -1,3 +1,5 @@
+import { config } from '../config.js';
+
 /**
  * Service for handling Product business logic.
  */
@@ -11,19 +13,42 @@ export class ProductService {
     }
 
     /**
+     * Formats the product data, ensuring absolute URLs for images.
+     * @param {Object} product - The raw product object from DB.
+     * @returns {Object} The formatted product.
+     */
+    _formatProduct(product) {
+        if (!product) return null;
+
+        let resimUrl = product.resimUrl;
+        if (resimUrl && !resimUrl.startsWith('http') && config.cdnUrl) {
+            const baseUrl = config.cdnUrl.endsWith('/') ? config.cdnUrl.slice(0, -1) : config.cdnUrl;
+            const path = resimUrl.startsWith('/') ? resimUrl : `/${resimUrl}`;
+            resimUrl = `${baseUrl}${path}`;
+        }
+
+        return {
+            ...product,
+            resimUrl
+        };
+    }
+
+    /**
      * Retrieves all products.
-     * @returns {Promise<Array<import('@prisma/client').Product>>} A promise that resolves to an array of products.
+     * @returns {Promise<Array<Object>>} A promise that resolves to an array of products.
      */
     async getAllProducts() {
-        return await this.productRepository.findAllWithCategories();
+        const products = await this.productRepository.findAllWithCategories();
+        return products.map(p => this._formatProduct(p));
     }
 
     /**
      * Retrieves a single product by its ID.
      * @param {string} id - The ID of the product.
-     * @returns {Promise<import('@prisma/client').Product|null>} A promise that resolves to the product object or null if not found.
+     * @returns {Promise<Object|null>} A promise that resolves to the product object or null if not found.
      */
     async getProductById(id) {
-        return await this.productRepository.findById(id);
+        const product = await this.productRepository.findById(id);
+        return this._formatProduct(product);
     }
 }

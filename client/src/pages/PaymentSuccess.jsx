@@ -3,7 +3,10 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { CheckCircle } from 'lucide-react';
 
+import { useTranslation } from 'react-i18next';
+
 export function PaymentSuccess() {
+    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { clearCart } = useCart();
@@ -18,9 +21,9 @@ export function PaymentSuccess() {
             <div className="flex justify-center mb-6">
                 <CheckCircle size={64} className="text-green-500" />
             </div>
-            <h1 className="text-3xl font-bold mb-4">Ödeme Başarılı!</h1>
+            <h1 className="text-3xl font-bold mb-4">{t('status.success')}</h1>
             <p className="text-gray-600 mb-8">
-                Siparişiniz için teşekkür ederiz. Sipariş no: #{orderNumber} onaylandı.
+                {t('status.paymentSuccessful')} {t('status.orderNumber')}: #{orderNumber}
             </p>
 
             <div className="flex flex-col gap-4 justify-center items-center">
@@ -29,7 +32,7 @@ export function PaymentSuccess() {
                         onClick={() => navigate(`/siparis-takip?token=${searchParams.get('trackingToken')}`)}
                         className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition w-full md:w-auto"
                     >
-                        Siparişimi Görüntüle
+                        {t('header.trackOrder')}
                     </button>
                 )}
 
@@ -37,7 +40,7 @@ export function PaymentSuccess() {
                     onClick={() => navigate('/')}
                     className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition w-full md:w-auto"
                 >
-                    Alışverişe Devam Et
+                    {t('cart.continueShopping')}
                 </button>
             </div>
         </div>

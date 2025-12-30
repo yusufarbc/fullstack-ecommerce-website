@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 /**
- * Service for handling Order business logic including checkout and payment processing.
+ * Service for handling Siparis business logic including checkout and payment processing.
  */
 export class OrderService {
     /**
@@ -23,11 +23,10 @@ export class OrderService {
      * @returns {Promise<Object>} The result of the checkout process.
      */
     async processCheckout(checkoutData) {
-        // Renaming guestInfo to customerInfo for consistency
         const { items, guestInfo: customerInfo } = checkoutData;
 
         // 1. Calculate and Validate Total
-        let totalAmount = 0;
+        let toplamTutar = 0;
         const indexItems = []; // For Prisma
         const iyzicoItems = []; // For Iyzico
 
@@ -35,36 +34,36 @@ export class OrderService {
         for (const item of items) {
             const product = await this.productService.getProductById(item.id);
             if (product) {
-                totalAmount += Number(product.price) * item.quantity;
+                toplamTutar += Number(product.fiyat) * item.quantity;
 
                 // Data for Database (Prisma)
                 indexItems.push({
-                    productId: product.id,
-                    quantity: item.quantity,
-                    price: product.price
+                    urunId: product.id,
+                    adet: item.quantity,
+                    fiyat: product.fiyat
                 });
 
                 // Data for Iyzico
                 iyzicoItems.push({
                     id: product.id,
-                    name: product.name,
-                    category: product.category ? product.category.name : 'General',
-                    price: product.price,
+                    name: product.ad,
+                    category: product.kategori ? product.kategori.ad : 'General',
+                    price: product.fiyat,
                     quantity: item.quantity
                 });
             }
         }
 
-        // 2. Create Pending Order
+        // 2. Create Pending Siparis
         const { isCorporate, companyName, taxOffice, taxNumber } = checkoutData.invoiceInfo || {};
 
         // Generate Short Order Number (e.g. 738492)
-        const orderNumber = Math.floor(100000 + Math.random() * 900000).toString();
+        const siparisNumarasi = Math.floor(100000 + Math.random() * 900000).toString();
 
         // Split Full Name
         const fullNameParts = customerInfo.name.trim().split(' ');
-        const surname = fullNameParts.length > 1 ? fullNameParts.pop() : '';
-        const name = fullNameParts.join(' ');
+        const soyad = fullNameParts.length > 1 ? fullNameParts.pop() : '';
+        const ad = fullNameParts.join(' ');
 
         // Format Phone (+90...)
         let rawPhone = customerInfo.phone.replace(/\s/g, ''); // Remove spaces
@@ -74,61 +73,58 @@ export class OrderService {
             rawPhone = '+90' + rawPhone; // Assume 5XX... -> +905XX...
         }
 
-        const country = 'Turkey';
+        const ulke = 'Türkiye';
 
         // Generate Secure Tracking Token (UUID)
-        const trackingToken = crypto.randomUUID();
+        const takipTokeni = crypto.randomUUID();
 
         const orderData = {
-            totalAmount,
-            status: 'PENDING',
-            orderNumber: orderNumber,
-            trackingToken: trackingToken,
-            name: name || customerInfo.name, // Fallback to full name if split fails
-            surname: surname,
-            email: customerInfo.email,
-            phone: rawPhone,
-            address: customerInfo.address,
-            city: customerInfo.city,
-            district: customerInfo.district,
-            zipCode: customerInfo.zipCode,
-            country: country,
-            isCorporate: !!isCorporate,
-            companyName: companyName || null,
-            taxOffice: taxOffice || null,
-            taxNumber: taxNumber || null,
-            items: {
+            toplamTutar,
+            durum: 'BEKLEMEDE',
+            siparisNumarasi: siparisNumarasi,
+            takipTokeni: takipTokeni,
+            ad: ad || customerInfo.name, // Fallback to full name if split fails
+            soyad: soyad,
+            eposta: customerInfo.email,
+            telefon: rawPhone,
+            adres: customerInfo.address,
+            sehir: customerInfo.city,
+            ilce: customerInfo.district,
+            postaKodu: customerInfo.zipCode,
+            ulke: ulke,
+            kurumsalMi: !!isCorporate,
+            sirketAdi: companyName || null,
+            vergiDairesi: taxOffice || null,
+            vergiNumarasi: taxNumber || null,
+            kalemler: {
                 create: indexItems
             }
         };
 
-        const order = await this.orderRepository.createOrder(orderData);
+        const siparis = await this.orderRepository.createOrder(orderData);
 
         // 3. Process Payment via Iyzico
         try {
             // Transform customerInfo to Iyzico Buyer format
             const buyer = {
-                id: 'customer-' + order.id,
-                name: name || 'Guest',
-                surname: surname || 'User',
+                id: 'customer-' + siparis.id,
+                name: ad || 'Guest',
+                surname: soyad || 'User',
                 email: customerInfo.email,
                 phone: rawPhone,
                 address: customerInfo.address,
                 city: customerInfo.city,
-                district: customerInfo.district, // Passing district to Iyzico Service
-                country: country,
+                district: customerInfo.district,
+                country: ulke,
                 zipCode: customerInfo.zipCode,
                 ip: '127.0.0.1' // In production, get this from request headers
             };
 
-            const paymentResult = await this.iyzicoService.startPaymentProcess(order, iyzicoItems, buyer);
-
-            // Save the token to the order for robust callback handling
-            await this.orderRepository.updatePaymentToken(order.id, paymentResult.token);
+            const paymentResult = await this.iyzicoService.startPaymentProcess(siparis, iyzicoItems, buyer);
 
             // Save the token to the order for robust callback handling
             if (paymentResult.token) {
-                await this.orderRepository.updatePaymentToken(order.id, paymentResult.token);
+                await this.orderRepository.updatePaymentToken(siparis.id, paymentResult.token);
             }
 
             // Return the payment page URL for client redirect
@@ -136,11 +132,10 @@ export class OrderService {
                 status: 'success',
                 paymentPageUrl: paymentResult.paymentPageUrl,
                 token: paymentResult.token,
-                orderId: order.id
+                orderId: siparis.id
             };
         } catch (error) {
             console.error('Iyzico Payment Start Error:', error);
-            // Optionally update order status to FAILED here
             return { status: 'failure', errorMessage: 'Payment initialization failed' };
         }
     }
@@ -156,42 +151,40 @@ export class OrderService {
             const result = await this.iyzicoService.retrievePaymentResult(token);
 
             if (result.status === 'success' && result.paymentStatus === 'SUCCESS') {
-                // 2. Find Order using the Payment Token (Most Robust Way)
+                // 2. Find Siparis using the Payment Token
                 console.log('Completing payment for Token:', token);
 
-                let order = await this.orderRepository.getOrderByPaymentToken(token);
-                console.log('DEBUG: Order found by token:', order ? { id: order.id, orderNumber: order.orderNumber } : 'null');
+                let siparis = await this.orderRepository.getOrderByPaymentToken(token);
 
-                if (!order) {
-                    // Fallback to conversationId if token lookup fails (legacy support or race condition)
+                if (!siparis) {
+                    // Fallback to conversationId if token lookup fails
                     const fallbackId = result.rawResult.conversationId;
-                    console.log('Token lookup failed, trying conversationId:', fallbackId);
                     if (fallbackId) {
-                        order = await this.orderRepository.getOrderById(fallbackId);
+                        siparis = await this.orderRepository.getOrderById(fallbackId);
                     }
                 }
 
-                if (!order) {
+                if (!siparis) {
                     throw new Error('Order not found for the given payment token');
                 }
 
-                // 3. Finalize Order (Transaction: Deduct Stock, Update Status)
-                await this.orderRepository.finalizeOrder(order.id);
+                // 3. Finalize Order
+                await this.orderRepository.finalizeOrder(siparis.id);
 
-                // 4. Retrieve Order details for email (Refresh data)
-                const freshOrder = await this.orderRepository.getOrderById(order.id);
+                // 4. Retrieve Order details for email
+                const freshOrder = await this.orderRepository.getOrderById(siparis.id);
 
                 if (freshOrder) {
-                    await this.emailService.sendOrderConfirmation(freshOrder.email, freshOrder.name, {
+                    await this.emailService.sendOrderConfirmation(freshOrder.eposta, freshOrder.ad, {
                         id: freshOrder.id,
-                        orderNumber: freshOrder.orderNumber, // Short Code
-                        trackingToken: freshOrder.trackingToken, // Secure Token for link
-                        total: freshOrder.totalAmount,
-                        items: freshOrder.items
+                        orderNumber: freshOrder.siparisNumarasi,
+                        trackingToken: freshOrder.takipTokeni,
+                        total: freshOrder.toplamTutar,
+                        items: freshOrder.kalemler
                     });
                 }
 
-                return { status: 'success', orderId: order.id, orderNumber: order.orderNumber, trackingToken: order.trackingToken };
+                return { status: 'success', orderId: siparis.id, orderNumber: siparis.siparisNumarasi, trackingToken: siparis.takipTokeni };
             } else {
                 return { status: 'failure', errorMessage: 'Payment not successful' };
             }
@@ -212,19 +205,19 @@ export class OrderService {
 
     /**
      * Retrieves an order by ID and optionally verifies the email.
-     * @param {number} id - Order ID.
+     * @param {string} id - Siparis ID.
      * @param {string} [email] - Guest email to verify.
      * @returns {Promise<Object>} The order object.
      * @throws {Error} If order not found or email mismatch.
      */
     async getOrderById(id, email) {
-        const order = await this.orderRepository.getOrderById(id);
-        if (!order) return null;
+        const siparis = await this.orderRepository.getOrderById(id);
+        if (!siparis) return null;
 
-        if (email && order.email !== email) {
+        if (email && siparis.eposta !== email) {
             throw new Error('Erişim reddedildi: E-posta adresi eşleşmiyor.');
         }
 
-        return order;
+        return siparis;
     }
 }

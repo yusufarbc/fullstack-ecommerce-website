@@ -8,87 +8,91 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum OrderStatus {
-  PENDING
-  PREPARING
-  SHIPPED
-  DELIVERED
-  COMPLETED
-  CANCELLED
+enum SiparisDurumu {
+  BEKLEMEDE
+  HAZIRLANIYOR
+  KARGOLANDI
+  TESLIM_EDILDI
+  TAMAMLANDI
+  IPTAL_EDILDI
 }
 
-enum InvoiceStatus {
-  NOT_ISSUED
-  ISSUED
-  PAID
+enum FaturaDurumu {
+  DUZENLENMEDI
+  DUZENLENDI
+  ODENDI
 }
 
+model Urun {
+  id          String           @id @default(uuid())
+  ad          String
+  fiyat       Decimal
+  aciklama    String?
+  resimUrl    String?
+  kategoriId  String?
+  kategori    Kategori?        @relation(fields: [kategoriId], references: [id])
+  siparisKalemleri SiparisKalemi[]
+  olusturulmaTarihi DateTime   @default(now())
+  guncellenmeTarihi DateTime   @updatedAt
 
-
-
-model Product {
-  id          String      @id @default(uuid())
-  name        String
-  price       Decimal
-
-  description String?
-  imageUrl    String?
-  categoryId  String?
-  category    Category?   @relation(fields: [categoryId], references: [id])
-  orderItems  OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  @@map("urunler")
 }
 
-model Category {
+model Kategori {
   id        String    @id @default(uuid())
-  name      String    @unique
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  ad        String    @unique
+  urunler   Urun[]
+  olusturulmaTarihi DateTime  @default(now())
+  guncellenmeTarihi DateTime  @updatedAt
+
+  @@map("kategoriler")
 }
 
-model Order {
-  id            String        @id @default(uuid())
-  items         OrderItem[]
-  totalAmount   Decimal
-  status        OrderStatus   @default(PENDING)
-  invoiceStatus InvoiceStatus @default(NOT_ISSUED)
+model Siparis {
+  id            String          @id @default(uuid())
+  kalemler      SiparisKalemi[]
+  toplamTutar   Decimal
+  durum         SiparisDurumu   @default(BEKLEMEDE)
+  faturaDurumu  FaturaDurumu    @default(DUZENLENMEDI)
   
-  // Customer & Shipping Info
-  email         String
-  name          String
-  surname       String
-  phone         String        // E.g. +905XXXXXXXXX
-  orderNumber   String        @unique // Short readable ID for tracking e.g. S-123456
-  trackingToken String?       @unique // Secure Token for tracking links (UUID)
-  address       String        // Mahalle, sokak, no bilgisi
-  city          String        // Iyzico: city
-  district      String        // Iyzico: district
-  zipCode       String        // Iyzico: zipCode
-  country       String        @default("Turkey") // Iyzico: country
+  // Müşteri & Gönderim Bilgileri
+  eposta        String
+  ad            String
+  soyad         String
+  telefon       String          // Örn: +905XXXXXXXXX
+  siparisNumarasi String        @unique // Takip için kısa okunabilir ID örn: S-123456
+  takipTokeni   String?         @unique // Takip linkleri için güvenli token (UUID)
+  adres         String          // Mahalle, sokak, no bilgisi
+  sehir         String
+  ilce          String
+  postaKodu     String
+  ulke          String          @default("Türkiye")
   
-  // Corporate Invoice Info
-  isCorporate   Boolean       @default(false)
-  companyName   String?
-  taxOffice     String?
-  taxNumber     String?
+  // Kurumsal Fatura Bilgileri
+  kurumsalMi    Boolean         @default(false)
+  sirketAdi     String?
+  vergiDairesi  String?
+  vergiNumarasi String?
   
-  // Payment Info (Iyzico)
-  paymentId     String?
-  paymentToken  String?       @unique // Iyzico Token for callback lookup
-  paymentStatus String?       @default("PENDING") // SUCCESS, FAILURE
+  // Ödeme Bilgileri (Iyzico)
+  odemeId       String?
+  odemeTokeni   String?         @unique // Callback eşleşmesi için Iyzico Token
+  odemeDurumu   String?         @default("PENDING") // SUCCESS, FAILURE
   
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  olusturulmaTarihi DateTime    @default(now())
+  guncellenmeTarihi DateTime    @updatedAt
+
+  @@map("siparisler")
 }
 
-model OrderItem {
+model SiparisKalemi {
   id        String   @id @default(uuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id])
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  quantity  Int
-  price     Decimal
+  siparisId String
+  siparis   Siparis  @relation(fields: [siparisId], references: [id])
+  urunId    String
+  urun      Urun     @relation(fields: [urunId], references: [id])
+  adet      Int
+  fiyat     Decimal
+
+  @@map("siparis_kalemleri")
 }

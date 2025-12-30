@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { CheckCircle, Clock, Package, AlertCircle } from 'lucide-react';
+import { CheckCircle, Clock, Package, AlertCircle, Phone, XCircle } from 'lucide-react';
+
+import { useTranslation } from 'react-i18next';
 
 const OrderTrackingPage = () => {
+    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
     const [order, setOrder] = useState(null);
@@ -35,6 +38,29 @@ const OrderTrackingPage = () => {
         fetchOrder();
     }, [token]);
 
+    const handleCancel = async () => {
+        if (!window.confirm(t('orders.cancelConfirm'))) return;
+
+        const reason = prompt(t('orders.cancelReason'));
+
+        try {
+            setLoading(true);
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/orders/cancel`, { token, reason });
+            // Refresh order
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/orders/track?token=${token}`);
+            if (response.data.status === 'success') {
+                setOrder(response.data.data);
+                alert(t('orders.cancelSuccess'));
+            }
+        } catch (err) {
+            alert(err.response?.data?.errorMessage || t('orders.cancelError'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const whatsappLink = order ? `https://wa.me/905555555555?text=Merhaba, Sipariş No: ${order.orderNumber} hakkında destek almak istiyorum.` : '#';
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen bg-gray-50">
@@ -50,7 +76,7 @@ const OrderTrackingPage = () => {
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Hata</h2>
                 <p className="text-gray-600 mb-6">{error}</p>
                 <Link to="/" className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                    Ana Sayfaya Dön
+                    {t('status.backToHome')}
                 </Link>
             </div>
         );
@@ -63,10 +89,13 @@ const OrderTrackingPage = () => {
                 <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h1 className="text-2xl font-bold">Sipariş Takibi</h1>
+                            <h1 className="text-2xl font-bold">{t('header.trackOrder')}</h1>
                             <p className="text-blue-100 mt-1">Sipariş No: #{order.orderNumber}</p>
                         </div>
-                        <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                        <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm flex gap-2">
+                            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-white hover:text-green-200 transition" title={t('orders.whatsappSupport')}>
+                                <Phone size={20} />
+                            </a>
                             <Clock className="w-6 h-6 text-white" />
                         </div>
                     </div>
@@ -75,17 +104,27 @@ const OrderTrackingPage = () => {
                 {/* Status Bar */}
                 <div className="p-6 border-b bg-gray-50">
                     <div className="flex items-center space-x-2">
-                        <span className="font-semibold text-gray-700">Durum:</span>
-                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${order.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                            order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                        <span className="font-semibold text-gray-700">{t('orders.status')}:</span>
+                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${order.status === 'TAMAMLANDI' ? 'bg-green-100 text-green-700' :
+                            order.status === 'BEKLEMEDE' ? 'bg-yellow-100 text-yellow-700' :
                                 'bg-gray-100 text-gray-700'
                             }`}>
-                            {order.status === 'COMPLETED' ? 'Tamamlandı' :
-                                order.status === 'PREPARING' ? 'Hazırlanıyor' :
-                                    order.status === 'SHIPPED' ? 'Kargoya Verildi' :
-                                        order.status === 'DELIVERED' ? 'Teslim Edildi' :
-                                            order.status === 'PENDING' ? 'Ödeme Bekleniyor' : order.status}
+                            {order.status === 'TAMAMLANDI' ? 'Tamamlandı' :
+                                order.status === 'HAZIRLANIYOR' ? 'Hazırlanıyor' :
+                                    order.status === 'KARGOLANDI' ? 'Kargoya Verildi' :
+                                        order.status === 'TESLIM_EDILDI' ? 'Teslim Edildi' :
+                                            order.status === 'IPTAL_EDILDI' ? 'İptal Edildi' :
+                                                order.status === 'BEKLEMEDE' ? 'Ödeme Bekleniyor' : order.status}
                         </span>
+
+                        {(order.status === 'BEKLEMEDE' || order.status === 'HAZIRLANIYOR') && (
+                            <button
+                                onClick={handleCancel}
+                                className="ml-4 flex items-center gap-1 text-red-600 hover:text-red-800 text-sm font-medium border border-red-200 px-3 py-1 rounded-full hover:bg-red-50 transition"
+                            >
+                                <XCircle size={14} /> {t('orders.cancelOrder')}
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -101,11 +140,11 @@ const OrderTrackingPage = () => {
                                         <Package size={20} />
                                     </div>
                                     <div>
-                                        <p className="font-medium text-gray-800">{item.product.name}</p>
-                                        <p className="text-sm text-gray-500">{item.quantity} Adet x ₺{Number(item.price).toFixed(2)}</p>
+                                        <p className="font-medium text-gray-800">{item.urun.ad}</p>
+                                        <p className="text-sm text-gray-500">{item.adet} Adet x ₺{Number(item.fiyat).toFixed(2)}</p>
                                     </div>
                                 </div>
-                                <span className="font-bold text-gray-800">₺{(Number(item.price) * item.quantity).toFixed(2)}</span>
+                                <span className="font-bold text-gray-800">₺{(Number(item.fiyat) * item.adet).toFixed(2)}</span>
                             </div>
                         ))}
                     </div>
@@ -126,7 +165,7 @@ const OrderTrackingPage = () => {
 
                 <div className="p-6 bg-gray-50 text-center border-t">
                     <Link to="/" className="text-blue-600 hover:text-blue-800 font-medium hover:underline">
-                        Alışverişe Devam Et
+                        {t('cart.continueShopping')}
                     </Link>
                 </div>
             </div>

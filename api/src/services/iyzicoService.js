@@ -1,4 +1,3 @@
-
 import Iyzipay from 'iyzipay';
 
 /**
@@ -22,20 +21,9 @@ export class IyzicoService {
     /**
      * Creates a payment session or initializes a checkout form.
      * 
-     * @param {import('@prisma/client').Order} order - The order details.
+     * @param {import('@prisma/client').Siparis} order - The order details.
      * @param {Array<Object>} basketItems - List of items in the basket.
      * @param {Object} buyer - Buyer information.
-     * @param {string} buyer.id - Buyer ID.
-     * @param {string} buyer.name - Buyer Name.
-     * @param {string} buyer.surname - Buyer Surname.
-     * @param {string} buyer.email - Buyer Email.
-     * @param {string} [buyer.phone] - Buyer GSM Number.
-     * @param {string} buyer.address - Registration address.
-     * @param {string} buyer.city - City.
-     * @param {string} buyer.country - Country.
-     * @param {string} buyer.zipCode - Zip Code.
-     * @param {string} [buyer.ip] - IP address.
-     * @returns {Promise<{status: string, paymentPageUrl: string, token: string}>} - The result.
      */
     async startPaymentProcess(order, basketItems, buyer) {
         console.log('Starting Iyzico payment for order:', order.id);
@@ -43,8 +31,8 @@ export class IyzicoService {
         const request = {
             locale: Iyzipay.LOCALE.TR,
             conversationId: order.id.toString(),
-            price: order.totalAmount.toString(), // Ensure string format
-            paidPrice: order.totalAmount.toString(),
+            price: order.toplamTutar.toString(), // Ensure string format
+            paidPrice: order.toplamTutar.toString(),
             currency: Iyzipay.CURRENCY.TRY,
             basketId: order.id.toString(),
             paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
@@ -70,7 +58,7 @@ export class IyzicoService {
                 city: buyer.city,
                 country: buyer.country,
                 address: buyer.address,
-                district: buyer.district, // Explicit district
+                district: buyer.district,
                 zipCode: buyer.zipCode
             },
             billingAddress: {

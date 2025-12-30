@@ -1,7 +1,7 @@
 import { BaseRepository } from './baseRepository.js';
 
 /**
- * Repository for handling Category data interactions.
+ * Repository for handling Kategori data interactions.
  * Extends BaseRepository for common CRUD operations.
  */
 export class CategoryRepository extends BaseRepository {
@@ -10,6 +10,6 @@ export class CategoryRepository extends BaseRepository {
      * @param {import('@prisma/client').PrismaClient} dbClient - The database client (PrismaClient).
      */
     constructor(dbClient) {
-        super(dbClient.category);
+        super(dbClient.kategori);
     }
 }

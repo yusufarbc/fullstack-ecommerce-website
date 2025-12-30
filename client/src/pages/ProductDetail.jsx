@@ -58,10 +58,10 @@ export function ProductDetail() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 {/* Image Section */}
                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden h-96 md:h-[500px] flex items-center justify-center bg-gray-50">
-                    {product.imageUrl ? (
+                    {product.resimUrl ? (
                         <img
-                            src={product.imageUrl}
-                            alt={product.name}
+                            src={product.resimUrl}
+                            alt={product.ad}
                             className="w-full h-full object-contain"
                         />
                     ) : (
@@ -71,11 +71,11 @@ export function ProductDetail() {
 
                 {/* Info Section */}
                 <div className="flex flex-col justify-center">
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
-                    <p className="text-2xl font-semibold text-blue-600 mb-6">₺{Number(product.price).toFixed(2)}</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{product.ad}</h1>
+                    <p className="text-2xl font-semibold text-blue-600 mb-6">₺{Number(product.fiyat).toFixed(2)}</p>
 
                     <div className="prose prose-lg text-gray-600 mb-8">
-                        <p>{product.description || 'Bu ürün için açıklama bulunmuyor.'}</p>
+                        <p>{product.aciklama || 'Bu ürün için açıklama bulunmuyor.'}</p>
                     </div>
 
                     <div className="flex items-center gap-4 border-t pt-8">
@@ -89,7 +89,7 @@ export function ProductDetail() {
                     </div>
 
                     <div className="mt-6 text-sm text-gray-500">
-                        Kategori: <span className="font-medium text-gray-900">{product.category ? product.category.name : 'Genel'}</span>
+                        Kategori: <span className="font-medium text-gray-900">{product.kategori ? product.kategori.ad : 'Genel'}</span>
                     </div>
                 </div>
             </div>

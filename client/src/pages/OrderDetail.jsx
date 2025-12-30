@@ -3,7 +3,10 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import api from '../lib/axios';
 import { ArrowLeft, Package, Calendar, MapPin, CreditCard } from 'lucide-react';
 
+import { useTranslation } from 'react-i18next';
+
 export function OrderDetail() {
+    const { t } = useTranslation();
     const { id } = useParams();
     const [searchParams] = useSearchParams();
     const email = searchParams.get('email');
@@ -22,16 +25,6 @@ export function OrderDetail() {
             }
 
             try {
-                // Determine API endpoint. 
-                // Since this is guest checkout, we might need a specific endpoint or use existing one.
-                // Assuming currently GET /api/v1/orders/:id might be protected or not check email.
-                // Ideally, we post database verification here or the API should handle it.
-                // For this implementation, let's try fetching and handle 403/401 if restricted.
-                // *Self-correction*: The implementation plan mentioned modifying Controller to verify email. 
-                // I will add the logic here assuming the API *will* be updated to support this verification or currently supports it.
-                // If API is strictly protected, this fetch will fail. 
-                // Let's assume for this step I will update the API Controller next.
-
                 const response = await api.get(`/api/v1/orders/${id}?email=${encodeURIComponent(email)}`);
                 setOrder(response.data);
             } catch (err) {
@@ -61,7 +54,7 @@ export function OrderDetail() {
                 onClick={() => navigate('/')}
                 className="text-blue-600 hover:underline flex items-center justify-center gap-2 inline-flex"
             >
-                <ArrowLeft size={16} /> Ana Sayfaya Dön
+                <ArrowLeft size={16} /> {t('status.backToHome')}
             </button>
         </div>
     );
@@ -74,7 +67,7 @@ export function OrderDetail() {
                 onClick={() => navigate('/')}
                 className="mb-8 text-gray-500 hover:text-gray-900 flex items-center gap-2 transition"
             >
-                <ArrowLeft size={20} /> Alışverişe Dön
+                <ArrowLeft size={20} /> {t('cart.continueShopping')}
             </button>
 
             <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
@@ -83,16 +76,21 @@ export function OrderDetail() {
                     <div>
                         <h1 className="text-2xl font-bold flex items-center gap-2">
                             <Package className="text-green-400" />
-                            Sipariş #{order.id}
+                            Sipariş No: {order.siparisNumarasi}
                         </h1>
                         <p className="text-gray-400 mt-1 flex items-center gap-2">
                             <Calendar size={14} />
-                            {new Date(order.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            {new Date(order.olusturulmaTarihi).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </p>
                     </div>
                     <div className="px-4 py-2 bg-white bg-opacity-20 rounded-lg backdrop-blur-sm">
                         <span className="text-sm uppercase tracking-wider font-semibold">
-                            {order.status === 'SUCCESS' ? 'Onaylandı' : order.status}
+                            {order.durum === 'TAMAMLANDI' ? 'Tamamlandı' :
+                                order.durum === 'HAZIRLANIYOR' ? 'Hazırlanıyor' :
+                                    order.durum === 'KARGOLANDI' ? 'Kargoya Verildi' :
+                                        order.durum === 'TESLIM_EDILDI' ? 'Teslim Edildi' :
+                                            order.durum === 'IPTAL_EDILDI' ? 'İptal Edildi' :
+                                                order.durum === 'BEKLEMEDE' ? 'Beklemede' : order.durum}
                         </span>
                     </div>
                 </div>
@@ -105,10 +103,10 @@ export function OrderDetail() {
                                 <MapPin size={20} className="text-blue-600" /> Teslimat Bilgileri
                             </h3>
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                <p className="font-semibold text-gray-900">{order.guestName}</p>
-                                <p className="text-gray-600">{order.address}</p>
-                                <p className="text-gray-600">{order.zipCode} {order.city}</p>
-                                <p className="text-gray-600 mt-2">{order.guestEmail}</p>
+                                <p className="font-semibold text-gray-900">{order.ad} {order.soyad}</p>
+                                <p className="text-gray-600">{order.adres}</p>
+                                <p className="text-gray-600">{order.postaKodu} {order.ilce} / {order.sehir}</p>
+                                <p className="text-gray-600 mt-2">{order.eposta}</p>
                             </div>
                         </div>
                         <div>
@@ -118,7 +116,7 @@ export function OrderDetail() {
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <div className="flex justify-between mb-2">
                                     <span className="text-gray-600">Ara Toplam</span>
-                                    <span className="font-medium">₺{Number(order.totalAmount).toFixed(2)}</span>
+                                    <span className="font-medium">₺{Number(order.toplamTutar).toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between mb-2">
                                     <span className="text-gray-600">Kargo</span>
@@ -126,7 +124,7 @@ export function OrderDetail() {
                                 </div>
                                 <div className="border-t border-gray-200 my-2 pt-2 flex justify-between text-lg font-bold text-gray-900">
                                     <span>Toplam</span>
-                                    <span className="text-blue-600">₺{Number(order.totalAmount).toFixed(2)}</span>
+                                    <span className="text-blue-600">₺{Number(order.toplamTutar).toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
@@ -145,23 +143,23 @@ export function OrderDetail() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {order.items && order.items.map((item) => (
+                                {order.kalemler && order.kalemler.map((item) => (
                                     <tr key={item.id}>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 <div className="ml-0">
-                                                    <div className="text-sm font-medium text-gray-900">{item.product ? item.product.name : 'Ürün'}</div>
+                                                    <div className="text-sm font-medium text-gray-900">{item.urun ? item.urun.ad : 'Ürün'}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            ₺{Number(item.price).toFixed(2)}
+                                            ₺{Number(item.fiyat).toFixed(2)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {item.quantity}
+                                            {item.adet}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            ₺{(Number(item.price) * item.quantity).toFixed(2)}
+                                            ₺{(Number(item.fiyat) * item.adet).toFixed(2)}
                                         </td>
                                     </tr>
                                 ))}

@@ -8,27 +8,13 @@ Complete, production-ready monorepo structure for an E-Commerce application with
 
 ```
 fullstack-ecommerce-website/
-├── client/                 # React Frontend (Vite + Tailwind)
-│   ├── src/
-│   │   ├── lib/
-│   │   │   └── axios.js   # Axios instance with JWT interceptor
-│   │   ├── App.jsx        # Main application
-│   │   ├── main.jsx       # Entry point
-│   │   └── index.css      # Tailwind styles
-│   ├── Dockerfile
-│   ├── vite.config.js     # Vite config with proxy
-│   └── package.json
-│
-├── server/                # Node.js Backend (Express + AdminJS)
-│   ├── src/
-│   │   └── app.js        # Express app with AdminJS
-│   ├── prisma/
-│   │   ├── schema.prisma # Database schema
-│   │   └── seed.js       # Admin user seeding
-│   ├── Dockerfile
-│   └── package.json
-│
-├── docker-compose.yml     # Orchestration (DB + Backend + Frontend)
+├── admin/                 # Admin Panel (AdminJS + Express)
+├── api/                   # Backend API (Express + Prisma)
+├── client/                # Frontend Store (React + Vite)
+├── demo/                  # Demo assets
+├── docs/                  # Documentation
+├── infra/                 # Infrastructure configurations
+├── docker-compose.yml     # Orchestration
 ├── .env.example          # Environment variables template
 └── README.md             # This file
 ```

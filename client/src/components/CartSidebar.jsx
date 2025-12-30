@@ -1,5 +1,6 @@
 import { X, Minus, Plus, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useTranslation } from 'react-i18next';
 
 /**
  * CartSidebar Component.
@@ -17,6 +18,7 @@ export function CartSidebar() {
         removeFromCart,
         cartTotal
     } = useCart();
+    const { t } = useTranslation();
 
     if (!isSidebarOpen) return null;
 
@@ -29,7 +31,7 @@ export function CartSidebar() {
             <div className="absolute inset-y-0 right-0 max-w-full flex">
                 <div className="w-screen max-w-md bg-white shadow-xl flex flex-col h-full">
                     <div className="flex items-center justify-between px-4 py-6 border-b">
-                        <h2 className="text-lg font-medium text-gray-900">Sepetim</h2>
+                        <h2 className="text-lg font-medium text-gray-900">{t('cart.title')}</h2>
                         <button
                             onClick={closeSidebar}
                             className="text-gray-400 hover:text-gray-500"
@@ -41,12 +43,12 @@ export function CartSidebar() {
                     <div className="flex-1 overflow-y-auto p-4">
                         {cartItems.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                                <p>Sepetiniz boş.</p>
+                                <p>{t('cart.empty')}</p>
                                 <button
                                     onClick={closeSidebar}
                                     className="mt-4 text-blue-600 hover:text-blue-500 font-medium"
                                 >
-                                    Alışverişe Devam Et
+                                    {t('cart.continueShopping')}
                                 </button>
                             </div>
                         ) : (
@@ -54,10 +56,10 @@ export function CartSidebar() {
                                 {cartItems.map((item) => (
                                     <li key={item.id} className="flex py-2">
                                         <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                            {item.imageUrl ? (
+                                            {item.resimUrl ? (
                                                 <img
-                                                    src={item.imageUrl}
-                                                    alt={item.name}
+                                                    src={item.resimUrl}
+                                                    alt={item.ad}
                                                     className="h-full w-full object-cover object-center"
                                                 />
                                             ) : (
@@ -70,8 +72,8 @@ export function CartSidebar() {
                                         <div className="ml-4 flex flex-1 flex-col">
                                             <div>
                                                 <div className="flex justify-between text-base font-medium text-gray-900">
-                                                    <h3>{item.name}</h3>
-                                                    <p className="ml-4">${(item.price * item.quantity).toFixed(2)}</p>
+                                                    <h3>{item.ad}</h3>
+                                                    <p className="ml-4">₺{(Number(item.fiyat) * item.quantity).toFixed(2)}</p>
                                                 </div>
                                             </div>
                                             <div className="flex flex-1 items-end justify-between text-sm">
@@ -97,7 +99,7 @@ export function CartSidebar() {
                                                     className="font-medium text-red-600 hover:text-red-500 flex items-center gap-1"
                                                 >
                                                     <Trash2 size={16} />
-                                                    Sil
+                                                    {t('cart.remove')}
                                                 </button>
                                             </div>
                                         </div>
@@ -110,7 +112,7 @@ export function CartSidebar() {
                     {cartItems.length > 0 && (
                         <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
                             <div className="flex justify-between text-base font-medium text-gray-900">
-                                <p>Ara Toplam</p>
+                                <p>{t('cart.subtotal')}</p>
                                 <p>₺{cartTotal.toFixed(2)}</p>
                             </div>
                             <p className="mt-0.5 text-sm text-gray-500">Kargo ve vergiler ödeme adımında hesaplanır.</p>
@@ -122,7 +124,7 @@ export function CartSidebar() {
                                     }}
                                     className="w-full flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-blue-700"
                                 >
-                                    Ödemeye Geç
+                                    {t('cart.checkout')}
                                 </button>
                             </div>
                         </div>

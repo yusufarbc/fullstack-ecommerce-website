@@ -4,7 +4,10 @@ import api from '../lib/axios';
 import { ProductCard } from '../components/ProductCard';
 import { CategoryFilter } from '../components/CategoryFilter';
 
+import { useTranslation } from 'react-i18next';
+
 export function Home() {
+    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const searchQuery = searchParams.get('search')?.toLowerCase() || '';
 
@@ -35,13 +38,13 @@ export function Home() {
         let result = products;
 
         if (selectedCategory) {
-            result = result.filter(p => p.categoryId === selectedCategory);
+            result = result.filter(p => p.kategoriId === selectedCategory);
         }
 
         if (searchQuery) {
             result = result.filter(p =>
-                p.name.toLowerCase().includes(searchQuery) ||
-                (p.description && p.description.toLowerCase().includes(searchQuery))
+                p.ad.toLowerCase().includes(searchQuery) ||
+                (p.aciklama && p.aciklama.toLowerCase().includes(searchQuery))
             );
         }
 
@@ -70,12 +73,12 @@ export function Home() {
             </div>
 
             <h1 className="text-2xl font-bold text-gray-900 mb-6">
-                {selectedCategory ? 'Kategori Sonuçları' : 'Öne Çıkan Ürünler'}
+                {selectedCategory ? t('home.categoryResults') : t('home.featuredProducts')}
             </h1>
 
             {filteredProducts.length === 0 ? (
                 <div className="text-center py-12">
-                    <p className="text-gray-500 text-lg">Bu kategoride ürün bulunamadı.</p>
+                    <p className="text-gray-500 text-lg">{t('home.noProducts')}</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

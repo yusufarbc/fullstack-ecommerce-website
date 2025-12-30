@@ -1,7 +1,7 @@
 import { BaseRepository } from './baseRepository.js';
 
 /**
- * Repository for handling Order data interactions.
+ * Repository for handling Siparis data interactions.
  * Extends BaseRepository for common CRUD operations.
  */
 export class OrderRepository extends BaseRepository {
@@ -10,14 +10,14 @@ export class OrderRepository extends BaseRepository {
      * @param {import('@prisma/client').PrismaClient} dbClient - The database client (PrismaClient).
      */
     constructor(dbClient) {
-        super(dbClient.order);
+        super(dbClient.siparis);
         this.prisma = dbClient; // Needed for transactions
     }
 
     /**
-     * Creates a new order with associated items.
-     * @param {Object} orderData - The order data including items.
-     * @returns {Promise<Object>} The created order.
+     * Creates a new siparis with associated items.
+     * @param {Object} orderData - The siparis data including items.
+     * @returns {Promise<Object>} The created siparis.
      */
     async createOrder(orderData) {
         return this.model.create({
@@ -26,34 +26,34 @@ export class OrderRepository extends BaseRepository {
     }
 
     /**
-     * Updates payment status and order status.
-     * @param {string} id - The order ID.
+     * Updates payment status and siparis status.
+     * @param {string} id - The siparis ID.
      * @param {string} paymentStatus - The new payment status.
-     * @param {string} status - The new order status.
-     * @returns {Promise<Object>} The updated order.
+     * @param {string} status - The new siparis status.
+     * @returns {Promise<Object>} The updated siparis.
      */
     async updateStatus(id, paymentStatus, status) {
         return this.model.update({
             where: { id },
             data: {
-                paymentStatus,
-                status
+                odemeDurumu: paymentStatus,
+                durum: status
             }
         });
     }
 
     /**
-     * Finds an order by ID including its items.
-     * @param {number} id - Order ID.
-     * @returns {Promise<Object>} The order with items.
+     * Finds a siparis by ID including its items.
+     * @param {string} id - Siparis ID.
+     * @returns {Promise<Object>} The siparis with items.
      */
     async getOrderById(id) {
         return this.model.findUnique({
             where: { id },
             include: {
-                items: {
+                kalemler: {
                     include: {
-                        product: true
+                        urun: true
                     }
                 }
             }
@@ -61,65 +61,64 @@ export class OrderRepository extends BaseRepository {
     }
 
     /**
-     * Finalizes order: Sets status to PAID and decrements stock.
+     * Finalizes siparis: Sets status to PAID and decrements stock.
      * Uses a database transaction to ensure atomicity.
-     * @param {string} id - Order ID
-     * @returns {Promise<Object>} Updated Order
+     * @param {string} id - Siparis ID
+     * @returns {Promise<Object>} Updated Siparis
      */
     async finalizeOrder(id) {
         return this.prisma.$transaction(async (tx) => {
-            // 1. Get Order items
-            const order = await tx.order.findUnique({
+            // 1. Get Siparis items
+            const siparis = await tx.siparis.findUnique({
                 where: { id },
-                include: { items: true }
+                include: { kalemler: true }
             });
 
-            if (!order) throw new Error('Order not found');
+            if (!siparis) throw new Error('Order not found');
 
-
-
-            // 3. Update Order Status
-            return tx.order.update({
+            // 3. Update Siparis Status
+            return tx.siparis.update({
                 where: { id },
                 data: {
-                    status: 'PREPARING',
-                    paymentStatus: 'SUCCESS',
-                    invoiceStatus: 'ISSUED' // Trigger invoice generation flow
+                    durum: 'HAZIRLANIYOR',
+                    odemeDurumu: 'SUCCESS',
+                    faturaDurumu: 'DUZENLENDI' // Trigger invoice generation flow
                 }
             });
         });
     }
+
     /**
-     * Updates the payment token for an order.
-     * @param {string} id - Order ID.
+     * Updates the payment token for a siparis.
+     * @param {string} id - Siparis ID.
      * @param {string} token - Payment token from Iyzico.
      */
     async updatePaymentToken(id, token) {
         return this.model.update({
             where: { id },
-            data: { paymentToken: token }
+            data: { odemeTokeni: token }
         });
     }
 
     /**
-     * Finds an order by its payment token.
+     * Finds a siparis by its payment token.
      * @param {string} token - Payment token.
-     * @returns {Promise<Object>} The order.
+     * @returns {Promise<Object>} The siparis.
      */
     async getOrderByPaymentToken(token) {
         return this.model.findUnique({
-            where: { paymentToken: token },
-            include: { items: true }
+            where: { odemeTokeni: token },
+            include: { kalemler: true }
         });
     }
 
     async getOrderByTrackingToken(token) {
         return this.model.findUnique({
-            where: { trackingToken: token },
+            where: { takipTokeni: token },
             include: {
-                items: {
+                kalemler: {
                     include: {
-                        product: true
+                        urun: true
                     }
                 }
             }

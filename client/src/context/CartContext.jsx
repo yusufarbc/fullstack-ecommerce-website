@@ -10,7 +10,6 @@ const CartContext = createContext();
  * @param {React.ReactNode} props.children - Child components.
  */
 export function CartProvider({ children }) {
-    // ... implementation ...
     const [cartItems, setCartItems] = useState(() => {
         const savedCart = localStorage.getItem('cart');
         return savedCart ? JSON.parse(savedCart) : [];
@@ -68,7 +67,8 @@ export function CartProvider({ children }) {
     const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
     const closeSidebar = () => setIsSidebarOpen(false);
 
-    const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    // Using Turkish field 'fiyat' from schema
+    const cartTotal = cartItems.reduce((sum, item) => sum + (Number(item.fiyat) || 0) * item.quantity, 0);
     const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
     return (

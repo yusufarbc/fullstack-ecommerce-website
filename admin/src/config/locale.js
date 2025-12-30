@@ -23,10 +23,10 @@ export const locale = {
         },
         labels: {
             loginWelcome: 'Yönetim Paneline Hoşgeldiniz',
-            Product: 'Ürünler',
-            Category: 'Kategoriler',
-            Order: 'Siparişler',
-            User: 'Kullanıcılar', // Placeholder if model added later
+            Urun: 'Ürünler',
+            Kategori: 'Kategoriler',
+            Siparis: 'Siparişler',
+            SiparisKalemi: 'Sipariş Kalemleri',
             Navigation: 'Navigasyon',
             Pages: 'Sayfalar',
             Resources: 'Kaynaklar',
@@ -42,37 +42,50 @@ export const locale = {
             invalidCredentials: 'E-posta veya şifre hatalı',
         },
         resources: {
-            Product: {
+            Urun: {
                 properties: {
-                    name: 'Ürün Adı',
-                    description: 'Açıklama',
-                    price: 'Fiyat (TL)',
-                    stock: 'Stok Adedi',
-                    imageUrl: 'Görsel URL',
-                    categoryId: 'Kategori',
-                    createdAt: 'Oluşturulma Tarihi',
-                    updatedAt: 'Güncellenme Tarihi',
+                    ad: 'Ürün Adı',
+                    aciklama: 'Açıklama',
+                    fiyat: 'Fiyat (₺)',
+                    resimUrl: 'Görsel URL',
+                    kategoriId: 'Kategori',
+                    kategori: 'Kategori',
+                    olusturulmaTarihi: 'Oluşturulma Tarihi',
+                    guncellenmeTarihi: 'Güncellenme Tarihi',
                 }
             },
-            Category: {
+            Kategori: {
                 properties: {
-                    name: 'Kategori Adı',
-                    createdAt: 'Oluşturulma Tarihi',
-                    updatedAt: 'Güncellenme Tarihi',
+                    ad: 'Kategori Adı',
+                    olusturulmaTarihi: 'Oluşturulma Tarihi',
+                    guncellenmeTarihi: 'Güncellenme Tarihi',
                 }
             },
-            Order: {
+            Siparis: {
                 properties: {
-                    status: 'Durum',
-                    totalAmount: 'Toplam Tutar (TL)',
-                    name: 'Müşteri Adı',
-                    surname: 'Müşteri Soyadı',
-                    email: 'E-Posta',
-                    phone: 'Telefon',
-                    orderNumber: 'Sipariş No',
-                    trackingToken: 'Takip Tokeni (Gizli)',
-                    createdAt: 'Sipariş Tarihi',
-                    paymentStatus: 'Ödeme Durumu'
+                    durum: 'Durum',
+                    faturaDurumu: 'Fatura Durumu',
+                    toplamTutar: 'Toplam Tutar (₺)',
+                    ad: 'Müşteri Adı',
+                    soyad: 'Müşteri Soyadı',
+                    eposta: 'E-Posta',
+                    telefon: 'Telefon',
+                    siparisNumarasi: 'Sipariş No',
+                    takipTokeni: 'Takip Tokeni (Gizli)',
+                    adres: 'Adres',
+                    sehir: 'Şehir',
+                    ilce: 'İlçe',
+                    postaKodu: 'Posta Kodu',
+                    ulke: 'Ülke',
+                    kurumsalMi: 'Kurumsal mı?',
+                    sirketAdi: 'Şirket Adı',
+                    vergiDairesi: 'Vergi Dairesi',
+                    vergiNumarasi: 'Vergi Numarası',
+                    odemeId: 'Ödeme ID',
+                    odemeTokeni: 'Ödeme Tokeni',
+                    odemeDurumu: 'Ödeme Durumu',
+                    olusturulmaTarihi: 'Sipariş Tarihi',
+                    guncellenmeTarihi: 'Güncelleme Tarihi'
                 }
             }
         }

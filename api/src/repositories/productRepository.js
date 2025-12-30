@@ -1,7 +1,7 @@
 import { BaseRepository } from './baseRepository.js';
 
 /**
- * Repository for handling Product data interactions.
+ * Repository for handling Urun data interactions.
  * Extends BaseRepository for common CRUD operations.
  */
 export class ProductRepository extends BaseRepository {
@@ -10,21 +10,19 @@ export class ProductRepository extends BaseRepository {
      * @param {import('@prisma/client').PrismaClient} dbClient - The database client (PrismaClient).
      */
     constructor(dbClient) {
-        super(dbClient.product);
+        super(dbClient.urun);
     }
 
     /**
      * Retrieves all products including their associated category.
-     * @returns {Promise<Array<import('@prisma/client').Product & { category: import('@prisma/client').Category }>>} A promise that resolves to an array of products with categories.
+     * @returns {Promise<Array<import('@prisma/client').Urun & { kategori: import('@prisma/client').Kategori }>>} A promise that resolves to an array of products with categories.
      */
     async findAllWithCategories() {
         return this.findAll({
             include: {
-                category: true
+                kategori: true
             },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { olusturulmaTarihi: 'desc' }
         });
     }
-
-
 }

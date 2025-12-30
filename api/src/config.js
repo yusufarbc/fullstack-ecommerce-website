@@ -20,5 +20,6 @@ export const config = {
       sender: process.env.SMTP_SENDER || 'no-reply@siten.com',
     }
   },
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:3000'
+  clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
+  cdnUrl: process.env.CDN_URL
 };

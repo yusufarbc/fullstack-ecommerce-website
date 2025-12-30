@@ -3,7 +3,10 @@ import { useCart } from '../context/CartContext';
 import api from '../lib/axios';
 import turkeyData from '../data/turkiye.json';
 
+import { useTranslation } from 'react-i18next';
+
 export function CheckoutPage() {
+    const { t } = useTranslation();
     const { cartItems, cartTotal } = useCart();
     const [formData, setFormData] = useState({
         fullName: '',
@@ -207,22 +210,22 @@ export function CheckoutPage() {
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-8">
-            <h1 className="text-2xl font-bold mb-6">Ödeme</h1>
+            <h1 className="text-2xl font-bold mb-6">{t('checkout.title')}</h1>
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Guest Info */}
                     <div>
-                        <h2 className="text-lg font-medium mb-4">Teslimat Bilgileri</h2>
+                        <h2 className="text-lg font-medium mb-4">{t('checkout.shippingInfo')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <input
-                                type="text" name="fullName" placeholder="Ad Soyad"
+                                type="text" name="fullName" placeholder={t('checkout.name') + ' ' + t('checkout.surname')}
                                 required minLength={2}
                                 className={`border p-2 rounded ${errors.fullName ? 'border-red-500' : ''}`} onChange={handleInputChange}
                             />
                             {errors.fullName && <p className="text-red-500 text-xs">{errors.fullName}</p>}
 
                             <input
-                                type="email" name="email" placeholder="E-posta"
+                                type="email" name="email" placeholder={t('checkout.email')}
                                 required
                                 className={`border p-2 rounded ${errors.email ? 'border-red-500' : ''}`} onChange={handleInputChange}
                             />
@@ -231,7 +234,7 @@ export function CheckoutPage() {
                             <input
                                 type="tel"
                                 name="phone"
-                                placeholder="Telefon (05XX XXX XX XX)"
+                                placeholder={t('checkout.phone') + " (05XX XXX XX XX)"}
                                 value={formData.phone}
                                 onChange={handlePhoneChange}
                                 maxLength={15} // 0555 555 55 55 is 14 chars approx
@@ -240,7 +243,7 @@ export function CheckoutPage() {
                             {errors.phone && <p className="text-red-500 text-xs md:col-span-2">{errors.phone}</p>}
 
                             <input
-                                type="text" name="address" placeholder="Adres (Mahalle, Sokak, No...)"
+                                type="text" name="address" placeholder={t('checkout.address')}
                                 required minLength={10}
                                 className={`border p-2 rounded md:col-span-2 ${errors.address ? 'border-red-500' : ''}`} onChange={handleInputChange}
                             />
@@ -254,7 +257,7 @@ export function CheckoutPage() {
                                 className={`border p-2 rounded ${errors.city ? 'border-red-500' : ''}`}
                                 required
                             >
-                                <option value="">İl Seçiniz</option>
+                                <option value="">{t('checkout.city')}</option>
                                 {Object.keys(turkeyData).sort().map(city => (
                                     <option key={city} value={city}>{city}</option>
                                 ))}
@@ -269,14 +272,14 @@ export function CheckoutPage() {
                                 required
                                 disabled={!formData.city}
                             >
-                                <option value="">İlçe Seçiniz</option>
+                                <option value="">{t('checkout.district')}</option>
                                 {districts.map(dist => (
                                     <option key={dist} value={dist}>{dist}</option>
                                 ))}
                             </select>
 
                             <input
-                                type="text" name="zipCode" placeholder="Posta Kodu"
+                                type="text" name="zipCode" placeholder={t('checkout.zipCode')}
                                 required minLength={3}
                                 className={`border p-2 rounded md:col-span-2 ${errors.zipCode ? 'border-red-500' : ''}`} onChange={handleInputChange}
                             />
@@ -369,7 +372,7 @@ export function CheckoutPage() {
                             disabled={loading}
                             className={`w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            {loading ? 'İşleniyor...' : 'Ödemeyi Tamamla'}
+                            {loading ? t('checkout.processing') : t('checkout.submitPayment')}
                         </button>
                     </div>
                 </form>
