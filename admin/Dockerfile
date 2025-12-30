@@ -14,6 +14,7 @@ RUN apk add --no-cache openssl
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src ./src
+COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 8081
 CMD ["node", "src/server.js"]

@@ -19,4 +19,4 @@ COPY --from=builder /app/prisma ./prisma
 
 ENV NODE_ENV=production
 EXPOSE 8080
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]

@@ -27,6 +27,7 @@ model Urun {
   id          String           @id @default(uuid())
   ad          String
   fiyat       Decimal
+  desi        Decimal          @default(1)
   aciklama    String?
   resimUrl    String?
   kategoriId  String?
@@ -52,6 +53,7 @@ model Siparis {
   id            String          @id @default(uuid())
   kalemler      SiparisKalemi[]
   toplamTutar   Decimal
+  kargoUcreti   Decimal         @default(0)
   durum         SiparisDurumu   @default(BEKLEMEDE)
   faturaDurumu  FaturaDurumu    @default(DUZENLENMEDI)
   
