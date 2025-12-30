@@ -68,6 +68,7 @@ export class OrderController {
                 orderNumber: order.siparisNumarasi,
                 status: order.durum,
                 totalAmount: order.toplamTutar,
+                shippingFee: order.kargoUcreti,
                 items: order.kalemler,
                 createdAt: order.olusturulmaTarihi,
                 shippingAddress: {

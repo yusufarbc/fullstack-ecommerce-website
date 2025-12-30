@@ -40,7 +40,7 @@ export function Header() {
                     <input
                         type="text"
                         placeholder={t('common.searchPlaceholder')}
-                        className="w-full border border-gray-300 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                        className="w-full border border-gray-300 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-gray-50"
                         onKeyDown={handleSearch}
                     />
                     <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
@@ -49,11 +49,11 @@ export function Header() {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={toggleSidebar}
-                        className="relative p-2 text-gray-600 hover:text-blue-600 transition rounded-full hover:bg-gray-100"
+                        className="relative p-2 text-gray-600 hover:text-primary-600 transition rounded-full hover:bg-gray-100"
                     >
                         <ShoppingCart size={24} />
                         {cartCount > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                                 {cartCount}
                             </span>
                         )}

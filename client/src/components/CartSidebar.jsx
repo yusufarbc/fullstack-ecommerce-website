@@ -46,7 +46,7 @@ export function CartSidebar() {
                                 <p>{t('cart.empty')}</p>
                                 <button
                                     onClick={closeSidebar}
-                                    className="mt-4 text-blue-600 hover:text-blue-500 font-medium"
+                                    className="mt-4 text-primary-600 hover:text-primary-500 font-medium"
                                 >
                                     {t('cart.continueShopping')}
                                 </button>
@@ -122,7 +122,7 @@ export function CartSidebar() {
                                         closeSidebar();
                                         window.location.href = '/checkout';
                                     }}
-                                    className="w-full flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-blue-700"
+                                    className="w-full flex items-center justify-center rounded-md border border-transparent bg-primary-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-primary-700"
                                 >
                                     {t('cart.checkout')}
                                 </button>

@@ -26,7 +26,8 @@ export class OrderService {
         const { items, guestInfo: customerInfo } = checkoutData;
 
         // 1. Calculate and Validate Total
-        let toplamTutar = 0;
+        let subTotal = 0;
+        let totalDesi = 0;
         const indexItems = []; // For Prisma
         const iyzicoItems = []; // For Iyzico
 
@@ -34,7 +35,8 @@ export class OrderService {
         for (const item of items) {
             const product = await this.productService.getProductById(item.id);
             if (product) {
-                toplamTutar += Number(product.fiyat) * item.quantity;
+                subTotal += Number(product.fiyat) * item.quantity;
+                totalDesi += Number(product.desi || 1) * item.quantity;
 
                 // Data for Database (Prisma)
                 indexItems.push({
@@ -52,6 +54,40 @@ export class OrderService {
                     quantity: item.quantity
                 });
             }
+        }
+
+        // Shipping Fee Logic (Construction Material & Desi Based)
+        const FREE_SHIPPING_THRESHOLD = 5000.00; // Construction materials are expensive
+        let shippingFee = 0;
+
+        if (subTotal >= FREE_SHIPPING_THRESHOLD) {
+            shippingFee = 0;
+        } else {
+            // Tiered Shipping based on Desi
+            if (totalDesi < 10) {
+                shippingFee = 50.00;
+            } else if (totalDesi < 30) {
+                shippingFee = 100.00;
+            } else {
+                // Base 100 TL + 5 TL per extra desi over 30
+                shippingFee = 100.00 + ((totalDesi - 30) * 5.00);
+            }
+        }
+
+        // Ensure shipping fee is rarely fractional weirdness
+        shippingFee = Number(shippingFee.toFixed(2));
+
+        const toplamTutar = subTotal + shippingFee;
+
+        // Add Shipping to Iyzico Items if exists
+        if (shippingFee > 0) {
+            iyzicoItems.push({
+                id: 'shipping-fee',
+                name: `Kargo Ücreti (${totalDesi} Desi)`,
+                category: 'Kargo',
+                price: shippingFee,
+                quantity: 1
+            });
         }
 
         // 2. Create Pending Siparis
@@ -80,6 +116,7 @@ export class OrderService {
 
         const orderData = {
             toplamTutar,
+            kargoUcreti: shippingFee,
             durum: 'BEKLEMEDE',
             siparisNumarasi: siparisNumarasi,
             takipTokeni: takipTokeni,
@@ -192,6 +229,45 @@ export class OrderService {
             console.error('Payment Completion Error:', error);
             throw error;
         }
+    }
+
+    /**
+     * Cancels an order with a reason.
+     * @param {string} token - The tracking token.
+     * @param {string} reason - The reason for cancellation.
+     * @returns {Promise<Object>} Success message.
+     */
+    async cancelOrder(token, reason) {
+        const order = await this.orderRepository.getOrderByTrackingToken(token);
+
+        if (!order) {
+            throw new Error('Sipariş bulunamadı.');
+        }
+
+        if (order.durum === 'IPTAL_EDILDI') {
+            throw new Error('Sipariş zaten iptal edilmiş.');
+        }
+
+        if (order.durum === 'KARGOLANDI' || order.durum === 'TESLIM_EDILDI' || order.durum === 'TAMAMLANDI') {
+            throw new Error('Kargoya verilmiş veya tamamlanmış siparişler iptal edilemez.');
+        }
+
+        console.log(`[Order Cancelled] Order: ${order.siparisNumarasi}, Reason: ${reason}`);
+
+        // Handle Iyzico Refund/Cancel if paid
+        if (order.odemeDurumu === 'SUCCESS' && order.odemeId) {
+            try {
+                await this.iyzicoService.cancelPayment(order.odemeId, reason);
+                console.log(`[Iyzico Refund] Success for Order: ${order.siparisNumarasi}`);
+            } catch (error) {
+                console.error(`[Iyzico Refund Failed] Order: ${order.siparisNumarasi}`, error);
+                throw new Error('Sipariş iptal edilirken ödeme iadesi başarısız oldu. Lütfen müşteri hizmetleri ile iletişime geçin.');
+            }
+        }
+
+        await this.orderRepository.cancelOrder(order.id);
+
+        return { status: 'success', message: 'Sipariş başarıyla iptal edildi ve ücret iadesi işlemi başlatıldı.' };
     }
 
     /**

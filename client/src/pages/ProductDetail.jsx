@@ -30,7 +30,7 @@ export function ProductDetail() {
 
     if (loading) return (
         <div className="flex justify-center items-center min-h-[50vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
     );
 
@@ -39,7 +39,7 @@ export function ProductDetail() {
             <p className="text-red-500 mb-4">{error || 'Ürün bulunamadı'}</p>
             <button
                 onClick={() => navigate('/')}
-                className="text-blue-600 hover:underline flex items-center justify-center gap-2"
+                className="text-primary-600 hover:underline flex items-center justify-center gap-2"
             >
                 <ArrowLeft size={16} /> Ürünlere Geri Dön
             </button>
@@ -72,7 +72,7 @@ export function ProductDetail() {
                 {/* Info Section */}
                 <div className="flex flex-col justify-center">
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{product.ad}</h1>
-                    <p className="text-2xl font-semibold text-blue-600 mb-6">₺{Number(product.fiyat).toFixed(2)}</p>
+                    <p className="text-2xl font-semibold text-primary-600 mb-6">₺{Number(product.fiyat).toFixed(2)}</p>
 
                     <div className="prose prose-lg text-gray-600 mb-8">
                         <p>{product.aciklama || 'Bu ürün için açıklama bulunmuyor.'}</p>
@@ -81,7 +81,7 @@ export function ProductDetail() {
                     <div className="flex items-center gap-4 border-t pt-8">
                         <button
                             onClick={() => addToCart(product)}
-                            className="flex-1 bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg hover:shadow-xl flex items-center justify-center gap-3 active:scale-95 transform duration-100"
+                            className="flex-1 bg-primary-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-primary-700 transition shadow-lg hover:shadow-xl flex items-center justify-center gap-3 active:scale-95 transform duration-100"
                         >
                             <ShoppingCart size={24} />
                             Sepete Ekle

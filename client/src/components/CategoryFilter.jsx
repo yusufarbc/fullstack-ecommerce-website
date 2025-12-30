@@ -33,7 +33,7 @@ export function CategoryFilter({ onCategorySelect, selectedCategory }) {
             <button
                 onClick={() => onCategorySelect(null)}
                 className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${selectedCategory === null
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-primary-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
             >
@@ -44,7 +44,7 @@ export function CategoryFilter({ onCategorySelect, selectedCategory }) {
                     key={category.id}
                     onClick={() => onCategorySelect(category.id)}
                     className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${selectedCategory === category.id
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-primary-600 text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                 >

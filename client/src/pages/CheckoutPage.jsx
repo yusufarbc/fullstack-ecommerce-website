@@ -338,7 +338,7 @@ export function CheckoutPage() {
                         <div className="flex items-start">
                             {/* KVKK Checkbox Removed as per new requirement */}
                             <p className="text-sm text-gray-600">
-                                Sipariş vererek <button onClick={(e) => handleLegalClick(e, '/legal/kvkk.html')} className="text-blue-600 hover:underline bg-transparent border-none p-0 cursor-pointer">KVKK Aydınlatma Metni</button>'ni okuduğunuzu ve verilerinizin sözleşme gereği işlenmesini kabul etmiş sayılırsınız.
+                                Sipariş vererek <button onClick={(e) => handleLegalClick(e, '/legal/kvkk.html')} className="text-primary-600 hover:underline bg-transparent border-none p-0 cursor-pointer">KVKK Aydınlatma Metni</button>'ni okuduğunuzu ve verilerinizin sözleşme gereği işlenmesini kabul etmiş sayılırsınız.
                             </p>
                         </div>
                         <div className="flex items-start">
@@ -355,7 +355,7 @@ export function CheckoutPage() {
                                 className={`h-4 w-4 mt-1 text-green-600 focus:ring-green-500 border-gray-300 rounded ${errors.salesAgreement ? 'border-red-500 outline-red-500' : ''}`}
                             />
                             <label htmlFor="salesAgreement" className={`ml-2 text-sm ${errors.salesAgreement ? 'text-red-500' : 'text-gray-600'}`}>
-                                <button onClick={(e) => handleLegalClick(e, '/legal/on-bilgilendirme.html')} className="text-blue-600 hover:underline bg-transparent border-none p-0 cursor-pointer">Ön Bilgilendirme Formu</button> ve <button onClick={(e) => handleLegalClick(e, '/legal/mesafeli-satis.html')} className="text-blue-600 hover:underline bg-transparent border-none p-0 cursor-pointer">Mesafeli Satış Sözleşmesi</button>'ni okudum ve onaylıyorum.
+                                <button onClick={(e) => handleLegalClick(e, '/legal/on-bilgilendirme.html')} className="text-primary-600 hover:underline bg-transparent border-none p-0 cursor-pointer">Ön Bilgilendirme Formu</button> ve <button onClick={(e) => handleLegalClick(e, '/legal/mesafeli-satis.html')} className="text-primary-600 hover:underline bg-transparent border-none p-0 cursor-pointer">Mesafeli Satış Sözleşmesi</button>'ni okudum ve onaylıyorum.
                             </label>
                             {errors.salesAgreement && <p className="text-red-500 text-xs w-full ml-6">{errors.salesAgreement}</p>}
                         </div>

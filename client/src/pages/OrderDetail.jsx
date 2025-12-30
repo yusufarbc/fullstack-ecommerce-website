@@ -40,7 +40,7 @@ export function OrderDetail() {
 
     if (loading) return (
         <div className="flex justify-center items-center min-h-[50vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
     );
 
@@ -52,7 +52,7 @@ export function OrderDetail() {
             <br />
             <button
                 onClick={() => navigate('/')}
-                className="text-blue-600 hover:underline flex items-center justify-center gap-2 inline-flex"
+                className="text-primary-600 hover:underline flex items-center justify-center gap-2 inline-flex"
             >
                 <ArrowLeft size={16} /> {t('status.backToHome')}
             </button>
@@ -75,7 +75,7 @@ export function OrderDetail() {
                 <div className="bg-gray-900 text-white px-8 py-6 flex justify-between items-center flex-wrap gap-4">
                     <div>
                         <h1 className="text-2xl font-bold flex items-center gap-2">
-                            <Package className="text-green-400" />
+                            <Package className="text-primary-400" />
                             Sipariş No: {order.siparisNumarasi}
                         </h1>
                         <p className="text-gray-400 mt-1 flex items-center gap-2">
@@ -100,7 +100,7 @@ export function OrderDetail() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                         <div>
                             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                <MapPin size={20} className="text-blue-600" /> Teslimat Bilgileri
+                                <MapPin size={20} className="text-primary-600" /> Teslimat Bilgileri
                             </h3>
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <p className="font-semibold text-gray-900">{order.ad} {order.soyad}</p>
@@ -111,7 +111,7 @@ export function OrderDetail() {
                         </div>
                         <div>
                             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                <CreditCard size={20} className="text-blue-600" /> Ödeme Özeti
+                                <CreditCard size={20} className="text-primary-600" /> Ödeme Özeti
                             </h3>
                             <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <div className="flex justify-between mb-2">
@@ -124,7 +124,7 @@ export function OrderDetail() {
                                 </div>
                                 <div className="border-t border-gray-200 my-2 pt-2 flex justify-between text-lg font-bold text-gray-900">
                                     <span>Toplam</span>
-                                    <span className="text-blue-600">₺{Number(order.toplamTutar).toFixed(2)}</span>
+                                    <span className="text-primary-600">₺{Number(order.toplamTutar).toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

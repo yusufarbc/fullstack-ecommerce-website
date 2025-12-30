@@ -124,4 +124,16 @@ export class OrderRepository extends BaseRepository {
             }
         });
     }
+
+    /**
+     * Cancels an order by setting its status to IPTAL_EDILDI.
+     * @param {string} id - Siparis ID.
+     * @returns {Promise<Object>} The updated siparis.
+     */
+    async cancelOrder(id) {
+        return this.model.update({
+            where: { id },
+            data: { durum: 'IPTAL_EDILDI' }
+        });
+    }
 }

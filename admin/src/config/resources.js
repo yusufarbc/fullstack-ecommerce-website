@@ -26,6 +26,7 @@ export const getAdminResources = (prisma, componentLoader) => {
                 properties: {
                     ad: { isTitle: true },
                     fiyat: { type: 'number', isRequired: true },
+                    desi: { type: 'number', isRequired: true, isVisible: { list: true, show: true, edit: true, filter: true } },
                     resimUrl: {
                         isVisible: false // Hide the raw URL field in forms
                     },

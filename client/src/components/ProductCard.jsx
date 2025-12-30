@@ -36,7 +36,7 @@ export function ProductCard({ product }) {
                     <span className="text-xl font-bold text-gray-900">₺{Number(product.fiyat).toFixed(2)}</span>
                     <button
                         onClick={() => addToCart(product)}
-                        className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition active:scale-95"
+                        className="p-2 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition active:scale-95"
                         aria-label={t('common.addToCart')}
                     >
                         <ShoppingCart size={20} />

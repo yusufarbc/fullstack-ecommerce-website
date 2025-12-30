@@ -38,7 +38,7 @@ export function PaymentSuccess() {
 
                 <button
                     onClick={() => navigate('/')}
-                    className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition w-full md:w-auto"
+                    className="bg-primary-600 text-white px-8 py-3 rounded-lg hover:bg-primary-700 transition w-full md:w-auto"
                 >
                     {t('cart.continueShopping')}
                 </button>

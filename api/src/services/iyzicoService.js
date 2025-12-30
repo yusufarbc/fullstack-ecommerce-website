@@ -132,4 +132,35 @@ export class IyzicoService {
             });
         });
     }
+    /**
+     * Cancels a payment transaction.
+     * @param {string} paymentId - The Iyzico payment ID.
+     * @param {string} reason - Cancellation reason.
+     * @returns {Promise<Object>} Cancellation result.
+     */
+    async cancelPayment(paymentId, reason) {
+        console.log(`Cancelling payment ${paymentId} with reason: ${reason}`);
+
+        return new Promise((resolve, reject) => {
+            this.iyzipay.cancel.create({
+                locale: Iyzipay.LOCALE.TR,
+                conversationId: paymentId,
+                paymentId: paymentId,
+                ip: '127.0.0.1'
+            }, (err, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                if (result.status !== 'success') {
+                    return reject(new Error(`Iyzico Cancel Error: ${result.errorMessage}`));
+                }
+
+                resolve({
+                    status: 'success',
+                    price: result.price,
+                    currency: result.currency
+                });
+            });
+        });
+    }
 }
