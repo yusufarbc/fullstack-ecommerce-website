@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/axios';
 import { CheckCircle, Clock, Package, AlertCircle, Phone, XCircle } from 'lucide-react';
 
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,7 @@ const OrderTrackingPage = () => {
             }
 
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/orders/track?token=${token}`);
+                const response = await api.get(`/api/v1/orders/track?token=${token}`);
                 if (response.data.status === 'success') {
                     setOrder(response.data.data);
                 } else {
@@ -45,9 +45,9 @@ const OrderTrackingPage = () => {
 
         try {
             setLoading(true);
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/orders/cancel`, { token, reason });
+            await api.post(`/api/v1/orders/cancel`, { token, reason });
             // Refresh order
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/orders/track?token=${token}`);
+            const response = await api.get(`/api/v1/orders/track?token=${token}`);
             if (response.data.status === 'success') {
                 setOrder(response.data.data);
                 alert(t('orders.cancelSuccess'));
