@@ -53,108 +53,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     createMobileMenu();
 
-    // ===== TECHNICAL TOAST SIMULATION =====
+    // Standard Interactions (No Tech Toasts)
 
-    // Create Toast Container
-    const toastContainer = document.createElement('div');
-    toastContainer.className = 'toast-container';
-    document.body.appendChild(toastContainer);
-
-    function showTechToast(title, body, meta) {
-        const toast = document.createElement('div');
-        toast.className = 'tech-toast';
-        toast.innerHTML = `
-            <div class="toast-header">
-                <span>🔄</span>
-                <span>${title}</span>
-            </div>
-            <div class="toast-body">${body}</div>
-            <div class="toast-meta">
-                <span>${meta.left}</span>
-                <span>${meta.right}</span>
-            </div>
-        `;
-
-        toastContainer.appendChild(toast);
-
-        // Animate in
-        requestAnimationFrame(() => {
-            toast.classList.add('visible');
-        });
-
-        // Remove after 4s
-        setTimeout(() => {
-            toast.classList.remove('visible');
-            setTimeout(() => toast.remove(), 400);
-        }, 4000);
-    }
-
-    // Bind Interaction Events
-
-    // 1. Add to Cart (Simulates API POST)
+    // 1. Add to Cart (Simple Increment)
     document.querySelectorAll('.btn-add-cart').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const productCard = e.target.closest('.product-card');
-            const productName = productCard.querySelector('.product-name').textContent;
+            // Update local Badge
+            const countBadge = document.querySelector('.cart-count');
+            countBadge.textContent = parseInt(countBadge.textContent) + 1;
 
-            showTechToast(
-                'API Request Sent',
-                `Adding <strong>"${productName}"</strong> to cart...<br>POST /api/v1/cart/items`,
-                { left: 'Node.js Service', right: '24ms' }
-            );
-
-            // Simulate Success after 800ms
-            setTimeout(() => {
-                showTechToast(
-                    'Database Update',
-                    `Transaction committed to <strong>PostgreSQL</strong>.<br>Cart total recalculated.`,
-                    { left: 'Prisma ORM', right: '12ms' }
-                );
-
-                // Update local Badge
-                const countBadge = document.querySelector('.cart-count');
-                countBadge.textContent = parseInt(countBadge.textContent) + 1;
-            }, 800);
+            // Optional: Simple browser alert or non-technical toast could go here if requested
+            // But keeping it silent/visual update only is cleaner for now.
         });
     });
 
-    // 2. Wishlist (Simulates Auth Guard)
+    // 2. Wishlist (Simple Toggle)
     document.querySelectorAll('.wishlist-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            showTechToast(
-                'Auth Middleware',
-                `Checking <strong>JWT Token</strong> in authorization header...<br>User authenticated.`,
-                { left: 'Passport.js', right: '5ms' }
-            );
-            setTimeout(() => {
-                btn.classList.toggle('active');
-                if (btn.style.fill === 'currentColor') btn.style.fill = 'none';
-                else btn.style.fill = 'currentColor'; // Simple visual toggle
-            }, 400);
+            btn.classList.toggle('active');
+            if (btn.style.fill === 'currentColor') btn.style.fill = 'none';
+            else btn.style.fill = 'currentColor';
         });
     });
 
-    // 3. Category Filter (Simulates Query)
-    document.querySelectorAll('.category-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const category = card.querySelector('.category-name').textContent;
-            showTechToast(
-                'Data Query',
-                `SELECT * FROM products WHERE category = '${category}'<br>LIMIT 20 OFFSET 0`,
-                { left: 'PostgreSQL', right: '15ms' }
-            );
-        });
-    });
-
-    // 4. Hero Button (Simulates Cache)
+    // 3. Hero Button (Scroll)
     const heroBtn = document.querySelector('.btn-primary');
     if (heroBtn) {
         heroBtn.addEventListener('click', () => {
-            showTechToast(
-                'Cache Hit',
-                `Fetching collection "New Season"<br>Served from <strong>Redis</strong> cache.`,
-                { left: 'Redis', right: '2ms' }
-            );
             document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
         });
     }
