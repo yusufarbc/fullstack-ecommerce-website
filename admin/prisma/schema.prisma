@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SiparisDurumu {
+  BEKLEMEDE
+  HAZIRLANIYOR
+  KARGOLANDI
+  TESLIM_EDILDI
+  TAMAMLANDI
+  IPTAL_EDILDI
+}
+
+enum FaturaDurumu {
+  DUZENLENMEDI
+  DUZENLENDI
+  ODENDI
+}
+
+model Urun {
+  id          String           @id @default(uuid())
+  ad          String
+  fiyat       Decimal
+  desi        Decimal          @default(1)
+  aciklama    String?
+  resimUrl    String?
+  kategoriId  String?
+  kategori    Kategori?        @relation(fields: [kategoriId], references: [id])
+  siparisKalemleri SiparisKalemi[]
+  olusturulmaTarihi DateTime   @default(now())
+  guncellenmeTarihi DateTime   @updatedAt
+
+  @@map("urunler")
+}
+
+model Kategori {
+  id        String    @id @default(uuid())
+  ad        String    @unique
+  urunler   Urun[]
+  olusturulmaTarihi DateTime  @default(now())
+  guncellenmeTarihi DateTime  @updatedAt
+
+  @@map("kategoriler")
+}
+
+model Siparis {
+  id            String          @id @default(uuid())
+  kalemler      SiparisKalemi[]
+  toplamTutar   Decimal
+  kargoUcreti   Decimal         @default(0)
+  durum         SiparisDurumu   @default(BEKLEMEDE)
+  faturaDurumu  FaturaDurumu    @default(DUZENLENMEDI)
+  
+  // Müşteri & Gönderim Bilgileri
+  eposta        String
+  ad            String
+  soyad         String
+  telefon       String          // Örn: +905XXXXXXXXX
+  siparisNumarasi String        @unique // Takip için kısa okunabilir ID örn: S-123456
+  takipTokeni   String?         @unique // Takip linkleri için güvenli token (UUID)
+  adres         String          // Mahalle, sokak, no bilgisi
+  sehir         String
+  ilce          String
+  postaKodu     String
+  ulke          String          @default("Türkiye")
+  
+  // Kurumsal Fatura Bilgileri
+  kurumsalMi    Boolean         @default(false)
+  sirketAdi     String?
+  vergiDairesi  String?
+  vergiNumarasi String?
+  
+  // Ödeme Bilgileri (Iyzico)
+  odemeId       String?
+  odemeTokeni   String?         @unique // Callback eşleşmesi için Iyzico Token
+  odemeDurumu   String?         @default("PENDING") // SUCCESS, FAILURE
+  
+  olusturulmaTarihi DateTime    @default(now())
+  guncellenmeTarihi DateTime    @updatedAt
+
+  @@map("siparisler")
+}
+
+model SiparisKalemi {
+  id        String   @id @default(uuid())
+  siparisId String
+  siparis   Siparis  @relation(fields: [siparisId], references: [id])
+  urunId    String
+  urun      Urun     @relation(fields: [urunId], references: [id])
+  adet      Int
+  fiyat     Decimal
+
+  @@map("siparis_kalemleri")
+}
