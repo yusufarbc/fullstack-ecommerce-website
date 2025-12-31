@@ -75,7 +75,11 @@ export function ProductDetail() {
                     <p className="text-2xl font-semibold text-primary-600 mb-6">₺{Number(product.fiyat).toFixed(2)}</p>
 
                     <div className="prose prose-lg text-gray-600 mb-8">
-                        <p>{product.aciklama || 'Bu ürün için açıklama bulunmuyor.'}</p>
+                        {product.aciklama ? (
+                            <div dangerouslySetInnerHTML={{ __html: product.aciklama }} />
+                        ) : (
+                            <p>Bu ürün için açıklama bulunmuyor.</p>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-4 border-t pt-8">
