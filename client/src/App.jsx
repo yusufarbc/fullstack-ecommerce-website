@@ -8,6 +8,7 @@ import { PaymentFailure } from './pages/PaymentFailure';
 import { CartProvider } from './context/CartContext';
 import { CartSidebar } from './components/CartSidebar';
 import { Header } from './components/Header';
+import { Footer } from './components/Footer';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
                             <Route path="/payment/failure" element={<PaymentFailure />} />
                         </Routes>
                     </main>
+                    <Footer />
                     <CartSidebar />
                 </div>
             </CartProvider>

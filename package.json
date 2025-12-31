@@ -1,6 +1,8 @@
 {
-    "name": "ecommerce-root",
+    "name": "luxeshop-monorepo",
     "version": "1.0.0",
+    "description": "A production-ready fullstack e-commerce solution featuring a modern React frontend, robust Express/Prisma backend, and AdminJS panel.",
+    "author": "LuxeShop Team",
     "private": true,
     "scripts": {
         "dev": "concurrently -n \"API,CLIENT,ADMIN\" -c \"blue,green,magenta\" \"npm run dev --prefix api\" \"npm run dev --prefix client\" \"npm run dev --prefix admin\"",

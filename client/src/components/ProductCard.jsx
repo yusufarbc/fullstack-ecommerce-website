@@ -16,33 +16,52 @@ export function ProductCard({ product }) {
     const { addToCart } = useCart();
 
     return (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
-            <Link to={`/product/${product.id}`} className="block h-48 bg-gray-200 relative">
-                {product.resimUrl ? (
-                    <img
-                        src={product.resimUrl}
-                        alt={product.ad}
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <div className="flex items-center justify-center h-full text-gray-400">
-                        Görsel Yok
-                    </div>
-                )}
+        <div className="product-card">
+            <Link to={`/product/${product.id}`}>
+                <div className="product-image">
+                    {product.resimUrl ? (
+                        <img
+                            src={product.resimUrl}
+                            alt={product.ad}
+                        />
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-gray-400 bg-gray-100">
+                            No Image
+                        </div>
+                    )}
+                    {/* Optional Badge or Wishlist could go here */}
+                </div>
             </Link>
-            <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">{product.ad}</h3>
-                <div className="flex items-center justify-between mt-4">
-                    <span className="text-xl font-bold text-gray-900">₺{Number(product.fiyat).toFixed(2)}</span>
-                    <button
-                        onClick={() => addToCart(product)}
-                        className="p-2 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition active:scale-95"
-                        aria-label={t('common.addToCart')}
-                    >
-                        <ShoppingCart size={20} />
-                    </button>
+
+            <div className="product-info">
+                <Link to={`/product/${product.id}`}>
+                    <h3 className="product-name">{product.ad}</h3>
+                </Link>
+                {product.aciklama && (
+                    <p className="product-description line-clamp-2">
+                        {product.aciklama}
+                    </p>
+                )}
+
+                {/* Placeholder Rating */}
+                <div className="product-rating">
+                    <span className="stars">★★★★★</span>
+                    <span className="rating-count">(99+)</span>
                 </div>
 
+                <div className="product-footer">
+                    <div className="product-price">
+                        <span className="price-current">
+                            ₺{Number(product.fiyat).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}
+                        </span>
+                    </div>
+                    <button
+                        onClick={() => addToCart(product)}
+                        className="btn-add-cart"
+                    >
+                        Sepete Ekle
+                    </button>
+                </div>
             </div>
         </div>
     );

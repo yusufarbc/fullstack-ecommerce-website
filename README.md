@@ -1,383 +1,128 @@
-# 🛒 E-Commerce Monorepo - Production Ready
+# LuxeShop Monorepo 🛍️
 
-Complete, production-ready monorepo structure for an E-Commerce application with Admin Panel.
+**A production-ready, full-stack e-commerce solution built with the PERN stack (PostgreSQL, Express, React, Node.js).**
+
+[![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://your-username.github.io/luxeshop-monorepo/)
+
+![LuxeShop Architecture](./docs/etrade_software_arch.png)
+
+## 🚀 Overview
+
+LuxeShop is a modern e-commerce platform designed for speed, scalability, and a premium user experience. It features a completely custom React storefront with a "Luxe" industrial design theme, a robust REST API backend, and a dedicated AdminJS panel for comprehensive management.
+
+**Key Features:**
+*   **Storefront**: High-performance React application with a custom "LuxeShop" theme (Indigo/Pink palette), responsive design, and dynamic product filtering.
+*   **Backend**: Secure Express.js REST API with Prisma ORM and Zod validation.
+*   **Admin Panel**: Independent AdminJS service for managing products, orders, customers, and content.
+*   **Payments**: Integrated Iyzico payment gateway (sandbox ready).
+*   **Infrastructure**: Dockerized services with a production-ready `docker-compose` setup.
 
 ## 🏗️ Architecture
 
-![Architecture Diagram](./etrade_software_arch.png)
+The repository is structured as a monorepo for easier development and deployment:
 
 ```
-fullstack-ecommerce-website/
+luxeshop-monorepo/
 ├── admin/                 # Admin Panel (AdminJS + Express)
 ├── api/                   # Backend API (Express + Prisma)
-├── client/                # Frontend Store (React + Vite)
-├── demo/                  # Demo assets
-├── docs/                  # Documentation
-├── infra/                 # Infrastructure configurations
-├── docker-compose.yml     # Orchestration
-├── .env.example          # Environment variables template
-└── README.md             # This file
+├── client/                # Storefront (React + Vite + Tailwind)
+├── infra/                 # Infrastructure & Nginx configs
+├── docker-compose.yml     # Container orchestration
+└── .env.example           # Environment configuration
 ```
 
-## 🚀 Tech Stack
+## 🛠️ Technology Stack
 
-### 💻 Software Development Stack
-This project is built using the **PERN Stack** (PostgreSQL, Express, React, Node.js), a robust full-stack solution for modern web applications.
-[Learn more about PERN Stack](https://www.geeksforgeeks.org/node-js/what-is-pern-stack/)
+### Frontend (Client)
+*   **React 18** & **Vite**: Fast development and building.
+*   **Tailwind CSS**: Utility-first styling with a custom "Luxe" configuration.
+*   **Axios**: Efficient HTTP requests.
+*   **Lucide React**: Modern iconography.
 
-### Backend
-- **Node.js** 18 (Alpine)
-- **Express.js** - Web framework
-- **Prisma ORM** - Database toolkit
-- **PostgreSQL 15** - Database
-- **AdminJS** - Auto-generated admin panel
-- **bcrypt** - Password hashing
-- **Session/Cookie** - Admin Authentication
-- **Helmet** - Security headers
-- **Zod** - Validation
+### Backend (API)
+*   **Node.js & Express**: Scalable server framework.
+*   **Prisma ORM**: Type-safe database access for PostgreSQL.
+*   **PostgreSQL 15**: Reliable relational database.
+*   **Zod**: Runtime schema validation.
+*   **JWT**: Secure stateless authentication.
 
-### Frontend
-- **React 18** - UI library
-- **Vite** - Build tool & dev server
-- **Tailwind CSS** - Styling
-- **Axios** - HTTP client with JWT interceptor
-- **React Router** - Navigation
-- **Lucide React** - Icons
+### Admin Panel
+*   **AdminJS**: Auto-generated admin interface.
+*   **Express Session**: Secure session management for admins.
 
-### DevOps
-- **Docker** - Containerization
-- **Docker Compose** - Multi-container orchestration
-- **PostgreSQL** - Persistent volumes
-
-## 📦 Quick Start
+## 📦 Getting Started
 
 ### Prerequisites
-- Docker & Docker Compose installed
-- Git
+*   **Docker & Docker Compose** (Recommended)
+*   OR Node.js v18+ and PostgreSQL v15+ for local manual setup.
 
-### 1. Clone & Setup
+### Quick Start (Docker)
 
-```bash
-git clone <repository-url>
-cd fullstack-ecommerce-website
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/luxeshop-monorepo.git
+    cd luxeshop-monorepo
+    ```
 
-# Copy environment variables
-cp .env.example .env
+2.  **Configure Environment:**
+    ```bash
+    cp .env.example .env
+    # Edit .env and update any placeholders (e.g., Database credentials, JWT secrets)
+    ```
 
-# Edit .env with your credentials (optional)
-nano .env
-```
+3.  **Run with Docker Compose:**
+    ```bash
+    docker-compose up --build
+    ```
+    *This command builds all images (client, api, admin) and starts the database.*
 
-### 2. Start with Docker Compose
+4.  **Access the Services:**
+    *   **Storefront**: [http://localhost:3000](http://localhost:3000)
+    *   **API**: [http://localhost:8080/api/v1](http://localhost:8080/api/v1)
+    *   **Admin Panel**: [http://localhost:8080/admin](http://localhost:8080/admin) (Proxied) or [http://localhost:8081/admin](http://localhost:8081/admin) (Direct)
 
-```bash
-# Build and start all services
-docker-compose up --build
-
-# Or run in detached mode
-docker-compose up -d --build
-```
-
-This will:
-1. Start PostgreSQL database
-2. Run Prisma migrations
-3. Seed admin user
-4. Start backend server (port 8080)
-5. Start frontend dev server (port 3000)
-
-### 3. Access the Application
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8080/api/v1
-- **Admin Panel**: http://localhost:8080/admin
-- **Health Check**: http://localhost:8080/api/v1/health
-
-### 4. Admin Login
-
-Default admin credentials (change in `.env`):
-- **Email**: admin@siten.com
-- **Password**: Admin123!
+### Default Admin Credentials
+*   **Email**: `admin@example.com`
+*   **Password**: `SecureAdminPassword!`
+*(Please change these in your database or `.env` for production)*
 
 ## 🔧 Development
 
-### Backend Development
+If you prefer running services individually without Docker:
 
+**1. Database**
+Ensure you have a PostgreSQL instance running and update `DATABASE_URL` in `.env`.
+
+**2. Backend API**
 ```bash
-cd server
-
-# Install dependencies
+cd api
 npm install
-
-# Generate Prisma Client
 npx prisma generate
-
-# Run migrations
 npx prisma migrate dev
-
-# Seed database
-npm run prisma:seed
-
-# Start dev server
 npm run dev
-
-# Open Prisma Studio
-npx prisma studio
 ```
 
-### Frontend Development
-
+**3. Client Storefront**
 ```bash
 cd client
-
-# Install dependencies
 npm install
-
-# Start dev server
 npm run dev
-
-# Build for production
-npm run build
 ```
 
-## 📝 Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Database
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DB=ecommerce
-
-# Backend
-PORT=8080
-DATABASE_URL=postgresql://postgres:postgres@db:5432/ecommerce?schema=public
-JWT_SECRET=your-super-secret-jwt-key-change-in-production-min-32-chars
-
-# Admin User
-ADMIN_EMAIL=admin@siten.com
-ADMIN_PASSWORD=Admin123!
-
-# Frontend
-VITE_API_URL=http://localhost:8080
-CLIENT_URL=http://localhost:3000
-```
-
-## 🗄️ Database Schema
-
-### User Model
-
-```prisma
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String   // bcrypt hashed
-  fullName  String
-  role      UserRole @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum UserRole {
-  ADMIN     // For Admin Panel access
-  USER      // Unused / Reserved
-  CUSTOMER  // Unused (Guest checkout only)
-}
-```
-
-> **Note**: The `User` table is currently used primarily for Administrators. Customers do not have accounts.
-
-## 🔐 Authentication & Checkout Flow
-
-### 1. Admin Authentication (Admin Panel Only)
-- The **Admin Panel** (`/admin`) is a completely separate service running in its own container.
-- It handles its own session-based authentication for administrators.
-- **Credentials**: Managed via environment variables or the database.
-
-### 2. Customer Guest Checkout (Client)
-- The **Client** application is a public-facing store that requires **NO authentication**.
-- Customers browse products and checkout as **Guests**.
-- No user registration or login functionality exists for customers.
-- This ensures a fast, friction-free shopping experience.
-
-## 🎨 Admin Panel
-The Admin Panel runs independently on port `8081` (default).
-
-- **URL**: `http://localhost:8081/admin`
-- **Features**: Product management, Order viewing, Category management.
-- **Technology**: AdminJS running on a dedicated Express server.
-- **Independence**: It does not share session state with the Client or API.
-
-## 🐳 Docker Services
-
-### Database (PostgreSQL)
-- **Image**: postgres:15-alpine
-- **Port**: 5432
-- **Volume**: postgres_data (persistent)
-- **Health check**: Automatic
-
-### Backend (Node.js)
-- **Port**: 8080
-- **Depends on**: Database
-- **Auto-runs**: Migrations + Seeding
-- **Hot reload**: Enabled with volumes
-
-### Frontend (React)
-- **Port**: 3000
-- **Proxy**: `/api` → `backend:8080`
-- **Hot reload**: Enabled with volumes
-
-## 📚 API Endpoints
-
-### Health Check
-```
-GET /api/v1/health
-```
-
-Response:
-```json
-{
-  "status": "success",
-  "message": "Server is running",
-  "timestamp": "2024-01-01T00:00:00.000Z",
-  "environment": "development",
-  "adminPanel": "http://localhost:8080/admin"
-}
-```
-
-## 🛠️ Useful Commands
-
-### Docker
-
+**4. Admin Panel**
 ```bash
-# View logs
-docker-compose logs -f
-
-# View specific service logs
-docker-compose logs -f backend
-
-# Restart services
-docker-compose restart
-
-# Stop all services
-docker-compose down
-
-# Remove volumes (⚠️ deletes data)
-docker-compose down -v
-
-# Rebuild specific service
-docker-compose up -d --build backend
-```
-
-### Prisma
-
-```bash
-# Create migration
-npx prisma migrate dev --name migration_name
-
-# Reset database (⚠️ deletes data)
-npx prisma migrate reset
-
-# Generate Prisma Client
+cd admin
+npm install
 npx prisma generate
-
-# Open Prisma Studio
-npx prisma studio
+npm run dev
 ```
 
-## 🔒 Security Best Practices
-
-- ✅ **Helmet.js** for security headers
-- ✅ **CORS** properly configured
-- ✅ **bcrypt** for password hashing (10 rounds)
-- ✅ **JWT** for stateless authentication
-- ✅ **Environment variables** for secrets
-- ✅ **Zod** for input validation
-- ⚠️ **Change default credentials** in production!
-- ⚠️ **Use strong JWT_SECRET** (min 32 characters)
-
-## 📁 MSC Architecture (Backend)
-
-```
-server/src/
-├── controllers/    # Request handlers
-├── services/       # Business logic
-├── models/         # Prisma models
-├── middleware/     # Auth, validation, etc.
-├── routes/         # API routes
-├── utils/          # Helper functions
-└── app.js          # Express entry point
-```
-
-## 🚀 Production Deployment
-
-### 1. Update Environment Variables
-
-```env
-NODE_ENV=production
-JWT_SECRET=<strong-random-secret>
-DATABASE_URL=<production-database-url>
-```
-
-### 2. Build Frontend
-
-```bash
-cd client
-npm run build
-```
-
-### 3. Deploy
-
-- Use Docker Compose with production config
-- Or deploy to cloud platforms (AWS, GCP, Azure)
-- Configure reverse proxy (Nginx)
-- Enable HTTPS with SSL certificates
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+## 🔐 Security & Best Practices
+*   **Helmet.js**: Applied for secure HTTP headers.
+*   **Rate Limiting**: Configured for API endpoints.
+*   **Input Validation**: All API inputs are validated using Zod schemas.
+*   **Environment Variables**: Sensitive keys are never hardcoded.
 
 ## 📄 License
 
-This project is licensed under the MIT License.
-
-## 🆘 Troubleshooting
-
-### Database Connection Error
-
-```bash
-# Check if database is running
-docker-compose ps
-
-# Restart database
-docker-compose restart db
-
-# Check logs
-docker-compose logs db
-```
-
-### Port Already in Use
-
-```bash
-# Change ports in docker-compose.yml
-ports:
-  - "3001:3000"  # Frontend
-  - "8081:8080"  # Backend
-```
-
-### Prisma Client Not Generated
-
-```bash
-cd server
-npx prisma generate
-```
-
----
-
-**Built with ❤️ using modern web technologies**
-
-For questions or support, please open an issue on GitHub.
+This project is open-sourced under the MIT License.

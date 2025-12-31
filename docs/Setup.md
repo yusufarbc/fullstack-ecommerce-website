@@ -20,8 +20,8 @@ docker-compose logs -f
 - **Storefront**: [http://localhost:3000](http://localhost:3000)
 - **API**: [http://localhost:8080/api/v1/products](http://localhost:8080/api/v1/products)
 - **Admin Panel**: [http://localhost:8081/admin](http://localhost:8081/admin)
-  - **Login**: `admin@store.com`
-  - **Password**: `securepassword`
+  - **Login**: `admin@example.com`
+  - **Password**: `SecureAdminPassword!`
 
 ## Database Management
 The database is initialized automatically. To reset or seed data:

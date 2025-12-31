@@ -1,7 +1,7 @@
 {
-    "name": "admin",
+    "name": "luxeshop-admin",
     "version": "1.0.0",
-    "description": "Admin Panel for E-commerce",
+    "description": "AdminJS panel for managing LuxeShop products, orders, and users.",
     "main": "src/server.js",
     "type": "module",
     "scripts": {
