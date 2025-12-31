@@ -99,3 +99,23 @@ To further harden the infrastructure, implementing **Cloudflare Tunnel (Argo Tun
 - **DDoS Immunity**: Direct IP attacks become impossible since the origin server rejects all non-tunnel traffic.
 - **Bot & Scraper Control**: Prevents competitors from scraping sensitive pricing data by enforcing strict Cloudflare bot verification policies before traffic enters the tunnel.
 - **Zero Trust Admin Access**: The Admin Panel can be placed behind Cloudflare Access, adding an identity provider (SSO) layer before the login page is even reachable.
+
+## Future Recommendations: Web Server Evolution (Caddy)
+
+For the next iteration of infrastructure, replacing Nginx with **Caddy** is strongly recommended. While Nginx is industry-standard, Caddy offers "out-of-the-box" modern DevOps features:
+
+### 1. Automatic HTTPS
+- **Zero-Touch SSL**: unlike Nginx which requires Certbot and cron jobs, Caddy automatically obtains and renews Let's Encrypt certificates for all defined domains.
+- **Security Focus**: Frees up engineering time to focus on API security rather than certificate management.
+
+### 2. Developer-Friendly Configuration (Caddyfile)
+- **Simplicity**: A reverse proxy setup that takes 15 lines in Nginx requires just 3 lines in Caddy:
+  ```caddy
+  api.yusufarbc.dev {
+      reverse_proxy api_container:3000
+  }
+  ```
+
+### 3. Modern Performance & Safety
+- **HTTP/3 (QUIC)**: Enabled by default, providing superior performance for image-heavy e-commerce traffic compared to standard HTTP/2.
+- **Memory Safety**: Written in Go, Caddy is naturally resistant to memory corruption responsibilities (buffer overflows) that C-based servers like Nginx may face.
