@@ -4,7 +4,7 @@
 
 [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://your-username.github.io/luxeshop-monorepo/)
 
-![LuxeShop Architecture](./docs/etrade_software_arch.png)
+![LuxeShop Architecture](./docs/ecommerce_software_arch.png)
 
 ## 🚀 Overview
 

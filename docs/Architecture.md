@@ -4,7 +4,7 @@ The application adopts a **Microservices-based Architecture** running on Docker,
 
 ## High-Level Overview
 
-![LuxeShop Architecture](./etrade_software_arch.png)
+![LuxeShop Architecture](./ecommerce_software_arch.png)
 
 ```mermaid
 graph TD
